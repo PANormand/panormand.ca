@@ -668,18 +668,7 @@
     })();
 
     // ── Liens sociaux + contact depuis CV ─────────────────
-    function applyCVContact() {
-      try {
-        const cv = JSON.parse(localStorage.getItem('pa-cv-data') || 'null');
-        if (!cv || !cv.contact) return;
-        const c = cv.contact;
-        if (c.linkedin) { document.getElementById('si-linkedin').href = c.linkedin; document.getElementById('cb-linkedin').href = c.linkedin; }
-        if (c.facebook) document.getElementById('si-facebook').href = c.facebook;
-        if (c.instagram) document.getElementById('si-instagram').href = c.instagram;
-        if (c.email) document.getElementById('cb-email').href = 'mailto:' + c.email;
-      } catch(e) {}
-    }
-    applyCVContact();
+    /* applyCVContact — géré par le script universel data-contact en bas de page */
 
     // ── Aperçu Blog ───────────────────────────────────────
     function getLang() { return document.body.dataset.lang || 'fr'; }
