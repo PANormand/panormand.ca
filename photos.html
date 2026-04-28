@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Photos — Pierre-Alexandre Normand</title>
+  <meta name="description" content="Album photo de Pierre-Alexandre Normand." />
+
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background .35s ease, color .35s ease;
+    }
+    img, svg { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    h1,h2,h3 {
+      font-family: var(--font-heading);
+      font-weight: 600; line-height: 1.15;
+      letter-spacing: -0.015em; margin: 0 0 .5em;
+    }
+    p { margin: 0 0 1em; }
+
+    /* ── Thèmes ── */
+    :root,
+    body[data-theme="editorial"] {
+      --font-heading: Georgia, "Times New Roman", "Cambria", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #f5f1e8;
+      --color-surface:   #fffdf8;
+      --color-text:      #1a1a1a;
+      --color-muted:     #6b655b;
+      --color-subtle:    #918a7d;
+      --color-border:    #e4ddcc;
+      --color-accent:    #7a3b2e;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #ece4d1;
+      --radius: 6px;
+      --shadow-sm: 0 1px 2px rgba(30,20,10,.04);
+      --shadow:    0 18px 40px -18px rgba(50,30,10,.18);
+    }
+    body[data-theme="executive"] {
+      --font-heading: "Cambria", Georgia, "Times New Roman", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #ffffff;
+      --color-surface:   #f5f7fb;
+      --color-text:      #0d1b33;
+      --color-muted:     #4a5569;
+      --color-subtle:    #7a8296;
+      --color-border:    #dbe1eb;
+      --color-accent:    #1a365d;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #e4ecf7;
+      --radius: 4px;
+      --shadow-sm: 0 1px 2px rgba(10,20,50,.04);
+      --shadow:    0 24px 48px -24px rgba(10,30,60,.18);
+    }
+    body[data-theme="signature"] {
+      --font-heading: Georgia, "Times New Roman", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #14110e;
+      --color-surface:   #1c1915;
+      --color-text:      #f5efe4;
+      --color-muted:     #a39b8c;
+      --color-subtle:    #8a8374;
+      --color-border:    #2c2823;
+      --color-accent:    #d4a968;
+      --color-accent-ink:#14110e;
+      --color-soft:      rgba(212,169,104,.08);
+      --radius: 10px;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.25);
+      --shadow:    0 28px 60px -26px rgba(0,0,0,.6);
+    }
+
+    /* ── Layout ── */
+    .wrap      { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+    .wrap-wide { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+    section    { padding: 80px 0 100px; }
+    @media (max-width: 720px) {
+      .wrap, .wrap-wide { padding: 0 20px; }
+      section { padding: 56px 0 72px; }
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: saturate(160%) blur(12px);
+      -webkit-backdrop-filter: saturate(160%) blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0;
+    }
+    .home-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-border);
+      font-size: .82rem; font-weight: 600;
+      color: var(--color-text); text-decoration: none;
+      background: var(--color-surface);
+      white-space: nowrap;
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+    }
+    .home-btn:hover {
+      border-color: var(--color-accent); color: var(--color-accent);
+      transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .home-btn svg { flex-shrink: 0; }
+    .btn-contact-nav {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-accent) !important;
+      font-size: .82rem; font-weight: 700 !important;
+      color: var(--color-accent) !important; text-decoration: none;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .btn-contact-nav:hover {
+      background: color-mix(in srgb, var(--color-accent) 18%, transparent) !important;
+      transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.10);
+    }
+    .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .pill {
+      display: inline-flex; gap: 2px; padding: 3px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+    }
+    .pill button {
+      border: 0; background: transparent; cursor: pointer;
+      font: inherit; font-size: .78rem; color: var(--color-muted);
+      padding: 5px 11px; border-radius: 999px;
+      transition: background .2s, color .2s;
+    }
+    .pill button.is-active { background: var(--color-accent); color: var(--color-accent-ink); }
+    .conn-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 13px; border-radius: 999px;
+      font-size: .78rem; color: var(--color-muted);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition: color .15s, border-color .15s;
+    }
+    .conn-link:hover { color: var(--color-text); border-color: var(--color-subtle); }
+    .conn-link svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .conn-label { display: inline; }
+    @media (max-width: 860px) { .nav { display: none; } }
+    @media (max-width: 480px) { .conn-label { display: none; } }
+
+    /* ── Section header ── */
+    .section-label {
+      font-size: .75rem; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--color-muted); margin-bottom: 14px;
+      display: inline-flex; gap: 10px; align-items: center;
+    }
+    .section-label::before { content: ""; width: 24px; height: 1px; background: var(--color-subtle); }
+    .section-title {
+      font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+      letter-spacing: -0.02em; margin-bottom: 16px; max-width: 760px;
+    }
+    .section-sub {
+      color: var(--color-muted); font-family: var(--font-heading);
+      font-style: italic; font-size: 1.1rem; margin-bottom: 56px;
+    }
+
+    /* ── Grille de photos ── */
+    .photo-grid {
+      columns: 3 280px;
+      column-gap: 16px;
+    }
+    .photo-item {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      position: relative;
+      cursor: zoom-in;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      background: var(--color-soft);
+      transition: transform .22s, box-shadow .22s;
+    }
+    .photo-item:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .photo-item img {
+      width: 100%; height: auto; display: block;
+      transition: opacity .3s;
+    }
+    .photo-caption {
+      padding: 10px 14px 12px;
+      font-size: .84rem; color: var(--color-muted);
+      font-family: var(--font-heading);
+      font-style: italic;
+      line-height: 1.45;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+    }
+    .photo-caption:empty { display: none; }
+
+    /* ── Placeholder (aucune photo) ── */
+    .empty-state {
+      text-align: center; padding: 80px 32px; color: var(--color-muted);
+    }
+    .empty-state .big {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 1; color: var(--color-border);
+      margin-bottom: 24px;
+    }
+    .empty-state p { font-size: 1.05rem; max-width: 440px; margin: 0 auto; }
+
+    /* ── Lightbox ── */
+    .lb-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.88);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .lb-overlay.open { display: flex; }
+    .lb-img-wrap {
+      max-width: min(90vw, 1100px);
+      max-height: 80vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .lb-img-wrap img {
+      max-width: 100%; max-height: 80vh;
+      object-fit: contain;
+      border-radius: var(--radius);
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+    }
+    .lb-caption {
+      color: rgba(255,255,255,.75);
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 18px;
+      max-width: 600px;
+    }
+    .lb-close {
+      position: fixed; top: 20px; right: 24px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      color: #fff; cursor: pointer; font: inherit;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .18s;
+      font-size: 1.2rem; line-height: 1;
+    }
+    .lb-close:hover { background: rgba(255,255,255,.25); }
+    .lb-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      color: #fff; cursor: pointer; font: inherit;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; transition: background .18s;
+    }
+    .lb-nav:hover { background: rgba(255,255,255,.25); }
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
+    .lb-counter {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,.5); font-size: .82rem; letter-spacing: .08em;
+    }
+    @media (max-width: 600px) {
+      .lb-nav { display: none; }
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 40px 0 60px;
+      color: var(--color-subtle); font-size: .82rem;
+      text-align: center;
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* ── Langues ── */
+    body[data-lang="fr"] [data-lang="en"],
+    body[data-lang="en"] [data-lang="fr"] { display: none !important; }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 4px;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    .contact-banner {
+      background: var(--color-accent);
+      color: var(--color-accent-ink);
+      padding: 56px 0;
+      text-align: center;
+    }
+    .contact-banner h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      font-weight: 600; letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--color-accent-ink);
+    }
+    .contact-banner p {
+      font-size: 1rem; opacity: .78; margin-bottom: 32px;
+      font-family: var(--font-heading); font-style: italic;
+    }
+    .contact-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 999px;
+      font: inherit; font-size: .9rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: opacity .18s, transform .18s;
+      letter-spacing: .01em;
+    }
+    .contact-btn:hover { opacity: .85; transform: translateY(-2px); }
+    .contact-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .contact-btn-primary { background: var(--color-accent-ink); color: var(--color-accent); }
+    .contact-btn-ghost   { background: transparent; color: var(--color-accent-ink); border: 1.5px solid rgba(255,255,255,.55); }
+    .contact-btn-ghost:hover { border-color: rgba(255,255,255,.9); }
+  </style>
+</head>
+<body data-theme="editorial" data-lang="fr">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="wrap-wide topbar-inner">
+      <a class="home-btn" href="index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-lang="fr">Accueil</span><span data-lang="en">Home</span>
+      </a>
+
+      <div class="controls">
+        <div class="pill" role="group" aria-label="Langue">
+          <button data-lang-btn="fr" class="is-active">FR</button>
+          <button data-lang-btn="en">EN</button>
+        </div>
+        <a class="conn-link" href="login.html" aria-label="Connexion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span class="conn-label" data-lang="fr">Connexion</span>
+          <span class="conn-label" data-lang="en">Login</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <section>
+    <div class="wrap-wide">
+      <div class="section-label">
+        <span data-lang="fr">Album</span><span data-lang="en">Gallery</span>
+      </div>
+      <h1 class="section-title" data-lang="fr">Photos.</h1>
+      <h1 class="section-title" data-lang="en">Photos.</h1>
+      <p class="section-sub" data-lang="fr">Moments, lieux et souvenirs.</p>
+      <p class="section-sub" data-lang="en">Moments, places, and memories.</p>
+
+      <div class="photo-grid" id="photoGrid">
+        <!-- rempli par JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-banner" id="contactBanner">
+    <div class="wrap">
+      <h2 data-lang="fr">Un projet ? Une opportunité ?</h2>
+      <h2 data-lang="en">A project or opportunity?</h2>
+      <p data-lang="fr">Je suis toujours ouvert aux conversations qui mènent quelque part.</p>
+      <p data-lang="en">I'm always open to conversations that lead somewhere.</p>
+      <div class="contact-btns">
+        <a class="contact-btn contact-btn-primary" href="mailto:panormand@ccapcable.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span data-lang="fr">Envoyer un courriel</span>
+          <span data-lang="en">Send an email</span>
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.linkedin.com/in/panormand/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.facebook.com/panormand" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.instagram.com/panormand" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>Pierre-Alexandre Normand</span>
+      <span> · </span>
+      <span data-lang="fr">© 2026 — Tous droits réservés.</span>
+      <span data-lang="en">© 2026 — All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lb-overlay" id="lbOverlay" role="dialog" aria-modal="true" aria-label="Photo agrandie">
+    <button class="lb-close" id="lbClose" aria-label="Fermer">✕</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Précédente">‹</button>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Suivante">›</button>
+    <div class="lb-img-wrap">
+      <img id="lbImg" src="" alt="" />
+    </div>
+    <p class="lb-caption" id="lbCaption"></p>
+    <div class="lb-counter" id="lbCounter"></div>
+  </div>
+
+  <script>
+    // ── Thème / Langue ──────────────────────────────────
+    (function () {
+      const t = localStorage.getItem('pa-theme');
+      const l = localStorage.getItem('pa-lang');
+      if (t) document.body.dataset.theme = t;
+      if (l) { document.body.dataset.lang = l; document.documentElement.lang = l; }
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        if (btn.dataset.langBtn === (l || 'fr')) btn.classList.add('is-active');
+        btn.addEventListener('click', () => {
+          const lang = btn.dataset.langBtn;
+          document.body.dataset.lang = lang;
+          document.documentElement.lang = lang;
+          document.querySelectorAll('[data-lang-btn]').forEach(b => b.classList.toggle('is-active', b.dataset.langBtn === lang));
+          try { localStorage.setItem('pa-lang', lang); } catch(e) {}
+          renderGrid();  // re-render captions in new lang
+        });
+      });
+    })();
+
+    function getLang() { return document.body.dataset.lang || 'fr'; }
+
+    // ── IndexedDB ───────────────────────────────────────
+    const DB_NAME = 'pa-photos-db', DB_STORE = 'photos', DB_VER = 1;
+    function openDB() {
+      return new Promise((res, rej) => {
+        const r = indexedDB.open(DB_NAME, DB_VER);
+        r.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(DB_STORE))
+            db.createObjectStore(DB_STORE, { keyPath: 'id' });
+        };
+        r.onsuccess = e => res(e.target.result);
+        r.onerror   = e => rej(e.target.error);
+      });
+    }
+    function getAllPhotos() {
+      return openDB().then(db => new Promise((res, rej) => {
+        const req = db.transaction(DB_STORE, 'readonly').objectStore(DB_STORE).getAll();
+        req.onsuccess = e => res(e.target.result.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
+        req.onerror   = e => rej(e.target.error);
+      }));
+    }
+
+    // ── Rendu de la grille ─────────────────────────────
+    let photos = [];
+    function renderGrid() {
+      const grid = document.getElementById('photoGrid');
+      const lang = getLang();
+      if (!photos.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="column-span:all;">
+            <div class="big">📷</div>
+            <p data-lang="fr">Aucune photo pour le moment.<br>L'album se remplit depuis l'espace d'administration.</p>
+            <p data-lang="en">No photos yet.<br>The album is filled from the admin panel.</p>
+          </div>`;
+        return;
+      }
+      grid.innerHTML = photos.map((p, i) => {
+        const caption = lang === 'fr' ? (p.caption_fr || '') : (p.caption_en || p.caption_fr || '');
+        return `
+          <div class="photo-item" data-idx="${i}" tabindex="0" role="button"
+               aria-label="${caption || (lang === 'fr' ? 'Voir la photo' : 'View photo')}">
+            <img src="${p.dataURL}" alt="${caption}" loading="lazy" />
+            ${caption ? `<div class="photo-caption">${caption}</div>` : ''}
+          </div>`;
+      }).join('');
+      grid.querySelectorAll('.photo-item').forEach(el => {
+        el.addEventListener('click', () => openLightbox(+el.dataset.idx));
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openLightbox(+el.dataset.idx); });
+      });
+    }
+
+    // ── Lightbox ────────────────────────────────────────
+    let lbIdx = 0;
+    const lbOverlay = document.getElementById('lbOverlay');
+    const lbImg     = document.getElementById('lbImg');
+    const lbCaption = document.getElementById('lbCaption');
+    const lbCounter = document.getElementById('lbCounter');
+
+    function openLightbox(idx) {
+      lbIdx = idx;
+      showLbPhoto();
+      lbOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('lbClose').focus();
+    }
+    function closeLightbox() {
+      lbOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function showLbPhoto() {
+      const p    = photos[lbIdx];
+      const lang = getLang();
+      lbImg.src  = p.dataURL;
+      lbImg.alt  = lang === 'fr' ? (p.caption_fr || '') : (p.caption_en || p.caption_fr || '');
+      lbCaption.textContent = lbImg.alt;
+      lbCounter.textContent = `${lbIdx + 1} / ${photos.length}`;
+      document.getElementById('lbPrev').style.visibility = lbIdx > 0 ? 'visible' : 'hidden';
+      document.getElementById('lbNext').style.visibility = lbIdx < photos.length - 1 ? 'visible' : 'hidden';
+    }
+    document.getElementById('lbClose').addEventListener('click', closeLightbox);
+    document.getElementById('lbPrev').addEventListener('click', () => { if (lbIdx > 0) { lbIdx--; showLbPhoto(); } });
+    document.getElementById('lbNext').addEventListener('click', () => { if (lbIdx < photos.length - 1) { lbIdx++; showLbPhoto(); } });
+    lbOverlay.addEventListener('click', e => { if (e.target === lbOverlay) closeLightbox(); });
+    document.addEventListener('keydown', e => {
+      if (!lbOverlay.classList.contains('open')) return;
+      if (e.key === 'Escape')      closeLightbox();
+      if (e.key === 'ArrowLeft'  && lbIdx > 0)              { lbIdx--; showLbPhoto(); }
+      if (e.key === 'ArrowRight' && lbIdx < photos.length - 1) { lbIdx++; showLbPhoto(); }
+    });
+
+    // ── Init ────────────────────────────────────────────
+    getAllPhotos().then(p => {
+      photos = p;
+      renderGrid();
+    }).catch(() => {
+      document.getElementById('photoGrid').innerHTML = `
+        <div class="empty-state" style="column-span:all;">
+          <div class="big">📷</div>
+          <p data-lang="fr">Album non disponible.</p>
+          <p data-lang="en">Album unavailable.</p>
+        </div>`;
+    });
+  </script>
+</body>
+</html>

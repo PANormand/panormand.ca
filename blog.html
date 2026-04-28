@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blog — Pierre-Alexandre Normand</title>
+  <meta name="description" content="Réflexions et articles de Pierre-Alexandre Normand sur la gestion, le leadership et les communications." />
+
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background .35s ease, color .35s ease;
+    }
+    img, svg { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    h1,h2,h3,h4 {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      margin: 0 0 .5em;
+    }
+    p { margin: 0 0 1em; }
+
+    :root,
+    body[data-theme="editorial"] {
+      --font-heading: Georgia, "Times New Roman", "Cambria", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #f5f1e8;
+      --color-surface:   #fffdf8;
+      --color-text:      #1a1a1a;
+      --color-muted:     #6b655b;
+      --color-subtle:    #918a7d;
+      --color-border:    #e4ddcc;
+      --color-accent:    #7a3b2e;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #ece4d1;
+      --radius: 6px;
+      --shadow-sm: 0 1px 2px rgba(30,20,10,.04);
+      --shadow:    0 18px 40px -18px rgba(50,30,10,.18);
+      --hero-rule: 1px solid #1a1a1a;
+      --chip-bg:   transparent;
+      --chip-br:   1px solid #1a1a1a;
+    }
+    body[data-theme="executive"] {
+      --font-heading: "Cambria", Georgia, "Times New Roman", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #ffffff;
+      --color-surface:   #f5f7fb;
+      --color-text:      #0d1b33;
+      --color-muted:     #4a5569;
+      --color-subtle:    #7a8296;
+      --color-border:    #dbe1eb;
+      --color-accent:    #1a365d;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #e4ecf7;
+      --radius: 4px;
+      --shadow-sm: 0 1px 2px rgba(10,20,50,.04);
+      --shadow:    0 24px 48px -24px rgba(10,30,60,.18);
+      --hero-rule: 3px solid #1a365d;
+      --chip-bg:   #e4ecf7;
+      --chip-br:   1px solid transparent;
+    }
+    body[data-theme="signature"] {
+      --font-heading: Georgia, "Times New Roman", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg:        #14110e;
+      --color-surface:   #1c1915;
+      --color-text:      #f5efe4;
+      --color-muted:     #a39b8c;
+      --color-subtle:    #8a8374;
+      --color-border:    #2c2823;
+      --color-accent:    #d4a968;
+      --color-accent-ink:#14110e;
+      --color-soft:      #2a241c;
+      --radius: 10px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+      --shadow:    0 28px 60px -28px rgba(0,0,0,.7);
+      --hero-rule: 1px solid #d4a968;
+      --chip-bg:   rgba(212,169,104,.08);
+      --chip-br:   1px solid #3a3226;
+    }
+
+    .wrap      { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+    .wrap-wide { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+    section    { padding: 88px 0; }
+    @media (max-width: 720px) {
+      .wrap, .wrap-wide { padding: 0 22px; }
+      section { padding: 60px 0; }
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: saturate(160%) blur(12px);
+      -webkit-backdrop-filter: saturate(160%) blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0;
+    }
+    .brand {
+      font-family: var(--font-heading);
+      font-weight: 600; font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .brand .dot { color: var(--color-accent); }
+    .home-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-border);
+      font-size: .82rem; font-weight: 600;
+      color: var(--color-text); text-decoration: none;
+      background: var(--color-surface);
+      white-space: nowrap;
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+    }
+    .home-btn:hover {
+      border-color: var(--color-accent); color: var(--color-accent);
+      transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .home-btn svg { flex-shrink: 0; }
+    .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .nav a {
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-border);
+      font-size: .82rem; font-weight: 600; letter-spacing: .02em;
+      color: var(--color-text); text-decoration: none;
+      background: var(--color-surface);
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .nav a:hover { border-color: var(--color-accent); color: var(--color-accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .nav a.active { border-color: var(--color-accent); color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 8%, transparent); }
+    .nav .btn-contact-nav {
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-accent) !important;
+      font-size: .82rem; font-weight: 700 !important; letter-spacing: .02em;
+      color: var(--color-accent) !important; text-decoration: none;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+    }
+    .nav .btn-contact-nav:hover {
+      background: color-mix(in srgb, var(--color-accent) 18%, transparent) !important;
+      border-color: var(--color-accent) !important;
+      transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.10);
+    }
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .pill {
+      display: inline-flex; gap: 2px; padding: 3px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+    }
+    .pill button {
+      border: 0; background: transparent; cursor: pointer;
+      font: inherit; font-size: .78rem; color: var(--color-muted);
+      padding: 5px 11px; border-radius: 999px;
+      transition: background .2s, color .2s;
+    }
+    .pill button.is-active { background: var(--color-accent); color: var(--color-accent-ink); }
+    @media (max-width: 860px) { .nav { display: none; } }
+
+    /* Lien connexion */
+    .conn-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 13px; border-radius: 999px;
+      font-size: .78rem; color: var(--color-muted);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition: color .15s, border-color .15s;
+    }
+    .conn-link:hover { color: var(--color-text); border-color: var(--color-subtle); }
+    .conn-link svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .conn-label { display: inline; }
+    @media (max-width: 480px) { .conn-label { display: none; } }
+
+    /* SECTION HEADER */
+    .section-label {
+      font-size: .75rem; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--color-muted); margin-bottom: 14px;
+      display: inline-flex; gap: 10px; align-items: center;
+    }
+    .section-label::before { content: ""; width: 24px; height: 1px; background: var(--color-subtle); }
+    .section-title {
+      font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+      letter-spacing: -0.02em; margin-bottom: 16px; max-width: 760px;
+    }
+    .section-sub {
+      color: var(--color-muted); font-family: var(--font-heading);
+      font-style: italic; font-size: 1.1rem; margin-bottom: 56px;
+    }
+
+    /* GRILLE D'ARTICLES */
+    .posts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .post-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: box-shadow .2s, transform .2s;
+      text-decoration: none; color: inherit;
+    }
+    .post-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .post-cover {
+      width: 100%; height: 180px;
+      background-size: cover; background-position: center;
+      background-color: var(--color-soft);
+      flex-shrink: 0;
+    }
+    .post-card-body { padding: 24px 24px 20px; display: flex; flex-direction: column; flex: 1; }
+    .post-tag {
+      font-size: .72rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--color-accent); margin-bottom: 12px;
+    }
+    .post-title {
+      font-family: var(--font-heading);
+      font-size: 1.2rem; font-weight: 600;
+      line-height: 1.3; margin-bottom: 12px;
+      color: var(--color-text);
+    }
+    .post-excerpt {
+      color: var(--color-muted); font-size: .93rem;
+      line-height: 1.6; flex: 1;
+    }
+    .post-meta {
+      margin-top: 20px; padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+      font-size: .8rem; color: var(--color-subtle);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .post-coming {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--color-soft);
+      color: var(--color-muted);
+      font-size: .72rem; letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* PLACEHOLDER CENTRAL */
+    .coming-soon {
+      text-align: center;
+      padding: 80px 32px;
+      color: var(--color-muted);
+    }
+    .coming-soon .big {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 1; color: var(--color-border);
+      margin-bottom: 24px;
+    }
+    .coming-soon p { font-size: 1.05rem; max-width: 480px; margin: 0 auto; }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0 60px;
+      color: var(--color-subtle); font-size: .82rem;
+      text-align: center;
+      border-top: 1px solid var(--color-border);
+    }
+
+    body[data-lang="fr"] [data-lang="en"],
+    body[data-lang="en"] [data-lang="fr"] { display: none !important; }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 3px; border-radius: 4px;
+    }
+
+
+
+
+
+
+
+
+    .contact-banner {
+      background: var(--color-accent);
+      color: var(--color-accent-ink);
+      padding: 56px 0;
+      text-align: center;
+    }
+    .contact-banner h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      font-weight: 600; letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--color-accent-ink);
+    }
+    .contact-banner p {
+      font-size: 1rem; opacity: .78; margin-bottom: 32px;
+      font-family: var(--font-heading); font-style: italic;
+    }
+    .contact-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 999px;
+      font: inherit; font-size: .9rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: opacity .18s, transform .18s;
+      letter-spacing: .01em;
+    }
+    .contact-btn:hover { opacity: .85; transform: translateY(-2px); }
+    .contact-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .contact-btn-primary { background: var(--color-accent-ink); color: var(--color-accent); }
+    .contact-btn-ghost   { background: transparent; color: var(--color-accent-ink); border: 1.5px solid rgba(255,255,255,.55); }
+    .contact-btn-ghost:hover { border-color: rgba(255,255,255,.9); }
+  </style>
+</head>
+<body data-theme="editorial" data-lang="fr">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="wrap-wide topbar-inner">
+      <a class="home-btn" href="index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-lang="fr">Accueil</span><span data-lang="en">Home</span>
+      </a>
+
+
+      <div class="controls">
+        <div class="pill" role="group" aria-label="Langue">
+          <button data-lang-btn="fr" class="is-active">FR</button>
+          <button data-lang-btn="en">EN</button>
+        </div>
+        <a class="conn-link" href="login.html" aria-label="Connexion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span class="conn-label" data-lang="fr">Connexion</span>
+          <span class="conn-label" data-lang="en">Login</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENU -->
+  <section>
+    <div class="wrap-wide">
+      <div class="section-label">
+        <span data-lang="fr">Blog</span><span data-lang="en">Blog</span>
+      </div>
+      <h1 class="section-title" data-lang="fr">Réflexions &amp; perspectives.</h1>
+      <h1 class="section-title" data-lang="en">Reflections &amp; perspectives.</h1>
+      <p class="section-sub" data-lang="fr">Gestion, leadership, communications — des idées à partager.</p>
+      <p class="section-sub" data-lang="en">Management, leadership, communications — ideas worth sharing.</p>
+
+      <!-- Grille rendue dynamiquement -->
+      <div class="posts-grid" id="postsGrid">
+        <!-- rempli par JavaScript -->
+      </div>
+    </div>
+  </section>
+
+
+  <section class="contact-banner" id="contactBanner">
+    <div class="wrap">
+      <h2 data-lang="fr">Un projet ? Une opportunité ?</h2>
+      <h2 data-lang="en">A project or opportunity?</h2>
+      <p data-lang="fr">Je suis toujours ouvert aux conversations qui mènent quelque part.</p>
+      <p data-lang="en">I'm always open to conversations that lead somewhere.</p>
+      <div class="contact-btns">
+        <a class="contact-btn contact-btn-primary" href="mailto:panormand@ccapcable.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span data-lang="fr">Envoyer un courriel</span>
+          <span data-lang="en">Send an email</span>
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.linkedin.com/in/panormand/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.facebook.com/panormand" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.instagram.com/panormand" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="wrap">
+      <span>Pierre-Alexandre Normand</span>
+      <span> · </span>
+      <span data-lang="fr">© 2026 — Tous droits réservés.</span>
+      <span data-lang="en">© 2026 — All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    const langBtns = document.querySelectorAll('[data-lang-btn]');
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.langBtn;
+        document.body.dataset.lang = lang;
+        document.documentElement.lang = lang;
+        langBtns.forEach(b => b.classList.toggle('is-active', b === btn));
+        try { localStorage.setItem('pa-lang', lang); } catch(e) {}
+        renderPosts();
+      });
+    });
+    try {
+      const t = localStorage.getItem('pa-theme');
+      const l = localStorage.getItem('pa-lang');
+      if (t) document.body.dataset.theme = t;
+      if (l) { document.body.dataset.lang = l; document.documentElement.lang = l; langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.langBtn === l)); }
+    } catch(e) {}
+
+    function getLang() { return document.body.dataset.lang || 'fr'; }
+
+    function fmtDate(d, lang) {
+      if (!d) return '';
+      return new Date(d + 'T12:00:00').toLocaleDateString(lang === 'fr' ? 'fr-CA' : 'en-CA', { year:'numeric', month:'long', day:'numeric' });
+    }
+
+    function renderPosts() {
+      let posts = [];
+      try { posts = JSON.parse(localStorage.getItem('pa-blog-posts') || '[]'); } catch(e) {}
+      const published = posts.filter(p => p.status === 'published');
+      const lang = getLang();
+      const grid = document.getElementById('postsGrid');
+
+      if (!published.length) {
+        // Afficher les 3 cartes placeholder
+        grid.innerHTML = [
+          { cat_fr:'Leadership', cat_en:'Leadership',
+            title_fr:'Diriger par l\'écoute : ce que la radio m\'a appris sur le management',
+            title_en:'Leading through listening: what radio taught me about management',
+            excerpt_fr:'Treize ans derrière un micro, c\'est treize ans à apprendre à capter l\'attention — et à la mériter.',
+            excerpt_en:'Thirteen years behind a microphone is thirteen years of learning how to earn — and keep — attention.' },
+          { cat_fr:'Gestion', cat_en:'Management',
+            title_fr:'Restructurer sans détruire : le cas des 3 stations du Bas-Saint-Laurent',
+            title_en:'Restructuring without breaking: the case of 3 radio stations',
+            excerpt_fr:'Comment dégager 180 000 $ d\'économies tout en préservant la culture d\'équipe.',
+            excerpt_en:'How to generate $180,000 in savings while protecting team culture.' },
+          { cat_fr:'Communications', cat_en:'Communications',
+            title_fr:'Conseiller politique : naviguer entre l\'urgence et la nuance',
+            title_en:'Political advisor: navigating urgency and nuance',
+            excerpt_fr:'Un rôle qui exige autant de rapidité que de précision — et où chaque mot compte double.',
+            excerpt_en:'A role that demands as much speed as precision — where every word carries extra weight.' }
+        ].map(p => `
+          <div class="post-card">
+            <div class="post-card-body">
+              <div class="post-tag">${lang === 'fr' ? p.cat_fr : p.cat_en}</div>
+              <div class="post-title">${lang === 'fr' ? p.title_fr : p.title_en}</div>
+              <div class="post-excerpt">${lang === 'fr' ? p.excerpt_fr : p.excerpt_en}</div>
+              <div class="post-meta">
+                <span class="post-coming">${lang === 'fr' ? 'À venir' : 'Coming soon'}</span>
+              </div>
+            </div>
+          </div>`).join('');
+        return;
+      }
+
+      grid.innerHTML = published.map(p => {
+        const title   = lang === 'fr' ? p.title_fr   : p.title_en;
+        const cat     = lang === 'fr' ? p.cat_fr     : p.cat_en;
+        const excerpt = lang === 'fr' ? p.excerpt_fr : p.excerpt_en;
+        const coverHtml = p.cover
+          ? `<div class="post-cover" style="background-image:url('${p.cover}')"></div>`
+          : '';
+        return `
+          <a class="post-card" href="article.html?id=${p.id}">
+            ${coverHtml}
+            <div class="post-card-body">
+              ${cat ? `<div class="post-tag">${cat}</div>` : ''}
+              <div class="post-title">${title || (lang === 'fr' ? 'Sans titre' : 'Untitled')}</div>
+              ${excerpt ? `<div class="post-excerpt">${excerpt}</div>` : ''}
+              <div class="post-meta">
+                <span>${fmtDate(p.date, lang)}</span>
+                <span style="color:var(--color-accent);font-weight:500">${lang === 'fr' ? 'Lire →' : 'Read →'}</span>
+              </div>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    renderPosts();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2639 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Administration — Pierre-Alexandre Normand</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      margin: 0; min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: .95rem; line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      background: var(--bg); color: var(--text);
+      transition: background .3s, color .3s;
+    }
+    a { color: inherit; text-decoration: none; }
+    h2, h3 { margin: 0; font-weight: 600; line-height: 1.2; }
+    p { margin: 0; }
+    input, textarea, select, button { font: inherit; }
+
+    /* ====== THÈMES ====== */
+    :root, body[data-theme="editorial"] {
+      --bg: #f5f1e8; --surface: #fffdf8; --surface2: #f0ebe0;
+      --text: #1a1a1a; --muted: #6b655b; --subtle: #918a7d;
+      --border: #e4ddcc; --accent: #7a3b2e; --accent-ink: #ffffff;
+      --radius: 6px;
+      --shadow: 0 2px 8px rgba(30,20,10,.07);
+      --shadow-lg: 0 20px 48px -18px rgba(50,30,10,.18);
+      --header-bg: #1a1a1a; --header-text: #f5efe4;
+    }
+    body[data-theme="executive"] {
+      --bg: #f5f7fb; --surface: #ffffff; --surface2: #edf1f7;
+      --text: #0d1b33; --muted: #4a5569; --subtle: #7a8296;
+      --border: #dbe1eb; --accent: #1a365d; --accent-ink: #ffffff;
+      --radius: 4px;
+      --shadow: 0 2px 8px rgba(10,20,50,.07);
+      --shadow-lg: 0 24px 52px -22px rgba(10,30,60,.18);
+      --header-bg: #0d1b33; --header-text: #e8ecf4;
+    }
+    body[data-theme="signature"] {
+      --bg: #14110e; --surface: #1c1915; --surface2: #242018;
+      --text: #f5efe4; --muted: #a39b8c; --subtle: #8a8374;
+      --border: #2c2823; --accent: #d4a968; --accent-ink: #14110e;
+      --radius: 10px;
+      --shadow: 0 2px 8px rgba(0,0,0,.3);
+      --shadow-lg: 0 28px 60px -26px rgba(0,0,0,.6);
+      --header-bg: #0a0907; --header-text: #f5efe4;
+    }
+
+    /* ====== LAYOUT ====== */
+    .wrap { max-width: 920px; margin: 0 auto; padding: 0 28px; }
+    @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+
+    /* ====== TOPBAR ====== */
+    .topbar { background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255,255,255,.08); position: sticky; top: 0; z-index: 50; }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; gap: 12px; }
+    .topbar-brand { font-size: .95rem; font-weight: 600; opacity: .9; letter-spacing: -0.01em; }
+    .topbar-brand .badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); margin-left: 8px; vertical-align: middle; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-view-site { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: var(--radius); font-size: .8rem; color: var(--header-text); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.15); transition: background .15s; }
+    .btn-view-site:hover { background: rgba(255,255,255,.18); }
+    .btn-logout { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: var(--radius); font-size: .8rem; color: var(--header-text); background: transparent; border: 1px solid rgba(255,255,255,.22); cursor: pointer; transition: background .15s; }
+    .btn-logout:hover { background: rgba(255,255,255,.10); }
+    @media (max-width: 480px) { .btn-view-site span { display: none; } }
+
+    /* ====== MAIN ====== */
+    main { padding: 32px 0 80px; }
+
+    /* ====== PANELS ====== */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px); box-shadow: var(--shadow); margin-bottom: 28px; overflow: hidden; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); gap: 12px; }
+    .panel-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text); }
+    .panel-title svg { color: var(--accent); flex-shrink: 0; }
+    .panel-body { padding: 24px; }
+
+    /* ====== THEME SELECTOR ====== */
+    .theme-options { display: flex; flex-wrap: wrap; gap: 14px; }
+    .theme-opt { flex: 1; min-width: 130px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 14px; border: 2px solid var(--border); border-radius: calc(var(--radius) + 2px); background: var(--surface2); cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .15s; font-size: .88rem; font-weight: 600; color: var(--muted); }
+    .theme-opt:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .theme-opt.is-active { border-color: var(--accent); color: var(--text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+    .theme-swatch { width: 56px; height: 40px; border-radius: 6px; border: 1px solid rgba(0,0,0,.08); overflow: hidden; display: flex; flex-direction: column; }
+    .swatch-top { flex: 1.2; } .swatch-bot { flex: 1; }
+    .swatch-editorial-top { background: #f5f1e8; } .swatch-editorial-bot { background: #7a3b2e; }
+    .swatch-executive-top { background: #ffffff; } .swatch-executive-bot { background: #1a365d; }
+    .swatch-signature-top { background: #14110e; } .swatch-signature-bot { background: #d4a968; }
+    .check-icon { display: none; color: var(--accent); }
+    .theme-opt.is-active .check-icon { display: block; }
+    .saved-toast { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 8px 14px; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 999px; font-size: .82rem; color: var(--accent); font-weight: 500; opacity: 0; transition: opacity .3s; }
+    .saved-toast.show { opacity: 1; }
+
+    /* ====== BLOG TABLE ====== */
+    .btn-new { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: var(--radius); background: var(--accent); color: var(--accent-ink); border: none; cursor: pointer; font-weight: 600; font-size: .88rem; transition: opacity .15s, transform .15s; }
+    .btn-new:hover { opacity: .9; transform: translateY(-1px); }
+    .posts-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .posts-table th { text-align: left; padding: 10px 12px; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--subtle); border-bottom: 1px solid var(--border); }
+    .posts-table td { padding: 13px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    .posts-table tr:last-child td { border-bottom: 0; }
+    .posts-table tr:hover td { background: var(--surface2); }
+    .badge-pub { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .badge-pub.published { background: color-mix(in srgb, #22c55e 15%, transparent); color: #15803d; }
+    .badge-pub.draft     { background: color-mix(in srgb, var(--subtle) 15%, transparent); color: var(--muted); }
+    body[data-theme="signature"] .badge-pub.published { color: #4ade80; }
+    .act-btn { background: none; border: none; cursor: pointer; padding: 5px 8px; border-radius: var(--radius); color: var(--muted); transition: background .15s, color .15s; font-size: .85rem; line-height: 1; }
+    .act-btn:hover { background: var(--surface2); color: var(--text); }
+    .act-btn.danger:hover { background: #fee2e2; color: #b91c1c; }
+    body[data-theme="signature"] .act-btn.danger:hover { background: rgba(239,68,68,.2); color: #f87171; }
+    .empty-state { text-align: center; padding: 36px 20px; color: var(--subtle); font-size: .93rem; }
+
+    /* ====== FORMULAIRE ====== */
+    .form-wrap { border-top: 1px solid var(--border); padding: 28px 24px; background: var(--surface2); }
+    .form-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+    .form-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 620px) { .form-cols { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field label { font-size: .72rem; letter-spacing: .15em; text-transform: uppercase; color: var(--subtle); font-weight: 600; }
+    .field input, .field select, .field textarea {
+      padding: 10px 13px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); outline: none; width: 100%;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23918a7d' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
+    .form-divider { border: 0; border-top: 1px solid var(--border); margin: 10px 0 20px; }
+    .form-section-label { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .btn-cancel { padding: 9px 18px; border-radius: var(--radius); background: transparent; border: 1px solid var(--border); color: var(--muted); cursor: pointer; transition: border-color .15s, color .15s; }
+    .btn-cancel:hover { border-color: var(--subtle); color: var(--text); }
+    .btn-save { padding: 9px 20px; border-radius: var(--radius); background: var(--accent); color: var(--accent-ink); border: none; cursor: pointer; font-weight: 600; transition: opacity .15s, transform .15s; display: flex; align-items: center; gap: 7px; }
+    .btn-save:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* ====== COUVERTURE ====== */
+    .cover-preview {
+      width: 100%; height: 190px;
+      background: var(--surface); border: 2px dashed var(--border);
+      border-radius: var(--radius); margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background-size: cover; background-position: center;
+      position: relative; overflow: hidden;
+      cursor: pointer; transition: border-color .2s;
+    }
+    .cover-preview:hover { border-color: var(--accent); }
+    .cover-preview.has-image { border-style: solid; border-color: var(--border); }
+    .cover-placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--subtle); font-size: .88rem; pointer-events: none; }
+    .cover-preview.has-image .cover-placeholder { display: none; }
+    .cover-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; color: #fff; font-size: .88rem; font-weight: 600; gap: 8px; }
+    .cover-preview.has-image:hover .cover-overlay { display: flex; }
+    .cover-row { display: flex; gap: 10px; align-items: center; }
+    .cover-row input[type="text"] { flex: 1; padding: 9px 13px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); outline: none; font: inherit; font-size: .9rem; transition: border-color .2s, box-shadow .2s; }
+    .cover-row input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent); }
+    .cover-sep { color: var(--subtle); font-size: .82rem; white-space: nowrap; }
+    .btn-upload-cover { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); color: var(--muted); cursor: pointer; font: inherit; font-size: .88rem; white-space: nowrap; transition: border-color .15s, color .15s; }
+    .btn-upload-cover:hover { border-color: var(--accent); color: var(--text); }
+    .btn-remove-cover { display: inline-flex; align-items: center; gap: 5px; padding: 9px 12px; border-radius: var(--radius); background: transparent; border: 1px solid var(--border); color: var(--subtle); cursor: pointer; font: inherit; font-size: .82rem; transition: border-color .15s, color .15s; }
+    .btn-remove-cover:hover { border-color: #e44; color: #c33; }
+    @media (max-width: 620px) { .cover-row { flex-wrap: wrap; } }
+
+    /* ====== ONGLETS FR/EN ====== */
+    .lang-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 0; }
+    .lang-tab-btn { padding: 8px 20px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; font-size: .88rem; color: var(--muted); font-weight: 500; transition: color .15s; }
+    .lang-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .lang-panel { display: none; padding-top: 18px; }
+    .lang-panel.active { display: block; }
+
+    /* ====== QUILL ====== */
+    .ql-container.ql-snow { border-color: var(--border); border-radius: 0 0 var(--radius) var(--radius); background: var(--surface); }
+    .ql-toolbar.ql-snow { border-color: var(--border); border-radius: var(--radius) var(--radius) 0 0; background: var(--surface2); flex-wrap: wrap; }
+    .ql-editor { min-height: 240px; color: var(--text); font-size: .95rem; line-height: 1.7; }
+    .ql-editor.ql-blank::before { color: var(--subtle); font-style: italic; }
+
+    /* Quill dark theme */
+    body[data-theme="signature"] .ql-toolbar.ql-snow { background: #242018; border-color: #3a3226; }
+    body[data-theme="signature"] .ql-container.ql-snow { background: #1c1915; border-color: #3a3226; }
+    body[data-theme="signature"] .ql-editor { color: #f5efe4; }
+    body[data-theme="signature"] .ql-snow .ql-stroke { stroke: #a39b8c; }
+    body[data-theme="signature"] .ql-snow .ql-fill { fill: #a39b8c; }
+    body[data-theme="signature"] .ql-snow .ql-picker { color: #a39b8c; }
+    body[data-theme="signature"] .ql-snow .ql-picker-options { background: #1c1915; border-color: #3a3226; }
+    body[data-theme="signature"] .ql-snow .ql-picker-item { color: #f5efe4; }
+    body[data-theme="signature"] .ql-snow .ql-tooltip { background: #1c1915; border-color: #3a3226; color: #f5efe4; box-shadow: 0 4px 16px rgba(0,0,0,.5); }
+    body[data-theme="signature"] .ql-snow .ql-tooltip input[type=text] { background: #242018; border-color: #3a3226; color: #f5efe4; }
+    body[data-theme="signature"] .ql-snow a { color: #d4a968; }
+    body[data-theme="signature"] .ql-snow .ql-toolbar button:hover .ql-stroke,
+    body[data-theme="signature"] .ql-snow .ql-toolbar button.ql-active .ql-stroke { stroke: #d4a968; }
+    body[data-theme="signature"] .ql-snow .ql-toolbar button:hover .ql-fill,
+    body[data-theme="signature"] .ql-snow .ql-toolbar button.ql-active .ql-fill { fill: #d4a968; }
+    body[data-theme="signature"] .ql-snow .ql-picker-label:hover,
+    body[data-theme="signature"] .ql-snow .ql-picker-label.ql-active { color: #d4a968; }
+
+    /* Quill font classes */
+    .ql-font-serif  { font-family: Georgia, "Times New Roman", serif !important; }
+    .ql-font-mono   { font-family: "Courier New", Courier, monospace !important; }
+
+    /* Quill font dropdown labels */
+    .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="serif"]::before  { content: "Georgia"; font-family: Georgia, serif; }
+    .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="serif"]::before  { content: "Georgia"; }
+    .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="mono"]::before   { content: "Courier"; font-family: "Courier New", monospace; }
+    .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="mono"]::before  { content: "Courier"; }
+    .ql-snow .ql-picker.ql-font .ql-picker-item:not([data-value])::before    { content: "Sans-serif"; }
+    .ql-snow .ql-picker.ql-font .ql-picker-label:not([data-value])::before   { content: "Sans-serif"; }
+
+    /* Quill size dropdown labels */
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before  { content: "Petite"; font-size: .8em; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before  { content: "Petite"; }
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before  { content: "Grande"; font-size: 1.2em; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before  { content: "Grande"; }
+    .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before   { content: "Très grande"; font-size: 1.5em; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before  { content: "Très grande"; }
+    .ql-snow .ql-picker.ql-size .ql-picker-item:not([data-value])::before    { content: "Normale"; }
+    .ql-snow .ql-picker.ql-size .ql-picker-label:not([data-value])::before   { content: "Normale"; }
+
+    /* ====== CV PANEL ====== */
+    .cv-tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 0 20px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+    .cv-tab-btn { padding: 11px 15px; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; font: inherit; font-size: .82rem; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; transition: color .15s; }
+    .cv-tab-btn:hover { color: var(--text); }
+    .cv-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .cv-section { display: none; padding: 24px; }
+    .cv-section.active { display: block; }
+    .cv-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+    .cv-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
+    .cv-item-body { flex: 1; min-width: 0; }
+    .cv-item-title { font-weight: 600; font-size: .9rem; color: var(--text); }
+    .cv-item-sub  { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .cv-item-acts { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+    .cv-act { background: none; border: none; cursor: pointer; padding: 5px 7px; border-radius: var(--radius); color: var(--muted); transition: background .15s, color .15s; font: inherit; font-size: .82rem; line-height: 1; }
+    .cv-act:hover { background: var(--surface); color: var(--text); }
+    .cv-act.danger:hover { background: #fee2e2; color: #b91c1c; }
+    body[data-theme="signature"] .cv-act.danger:hover { background: rgba(239,68,68,.2); color: #f87171; }
+    .cv-inline-form { padding: 18px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: var(--radius); margin-bottom: 14px; }
+    .cv-inline-title { font-size: .84rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 14px; }
+    .cv-toast { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 7px 14px; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 999px; font-size: .82rem; color: var(--accent); font-weight: 500; opacity: 0; transition: opacity .3s; }
+    .cv-toast.show { opacity: 1; }
+    .cv-add-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); background: transparent; border: 1px dashed var(--border); color: var(--muted); cursor: pointer; font: inherit; font-size: .85rem; transition: border-color .15s, color .15s; margin-bottom: 4px; }
+    .cv-add-btn:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+
+    /* ====== PHOTOS PANEL ====== */
+    .photo-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, background .2s, color .2s;
+      background: var(--surface2);
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .photo-drop-zone:hover, .photo-drop-zone.drag-over {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 6%, var(--surface2));
+      color: var(--text);
+    }
+    .photo-drop-zone input[type="file"] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+    }
+    .photo-drop-icon { font-size: 2.2rem; margin-bottom: 10px; line-height: 1; }
+    .photo-drop-text { font-size: .92rem; font-weight: 500; }
+    .photo-drop-sub  { font-size: .8rem; color: var(--subtle); margin-top: 5px; }
+
+    .photo-admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .photo-admin-item {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      box-shadow: var(--shadow);
+    }
+    .photo-admin-thumb {
+      width: 100%; height: 130px;
+      object-fit: cover; display: block;
+    }
+    .photo-admin-body { padding: 8px 10px 10px; }
+    .photo-admin-body input {
+      width: 100%; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text);
+      border-radius: calc(var(--radius) - 2px);
+      padding: 5px 8px; font: inherit; font-size: .78rem;
+      margin-top: 4px;
+      transition: border-color .15s;
+    }
+    .photo-admin-body input:focus { outline: none; border-color: var(--accent); }
+    .photo-admin-body label { font-size: .72rem; color: var(--subtle); letter-spacing: .04em; }
+    .photo-admin-acts {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; gap: 4px;
+    }
+    .photo-admin-save {
+      flex: 1; padding: 5px 8px; font: inherit; font-size: .76rem;
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      border-radius: calc(var(--radius) - 2px); cursor: pointer;
+      transition: background .15s;
+    }
+    .photo-admin-save:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+    .photo-admin-del {
+      padding: 5px 8px; font: inherit; font-size: .76rem;
+      background: none; color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) - 2px); cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .photo-admin-del:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+    body[data-theme="signature"] .photo-admin-del:hover { background: rgba(239,68,68,.15); color: #f87171; border-color: rgba(239,68,68,.3); }
+    .photo-order-btns { display: flex; gap: 2px; }
+    .photo-ord {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      border-radius: calc(var(--radius) - 2px); cursor: pointer;
+      width: 26px; height: 26px; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s, color .15s;
+    }
+    .photo-ord:hover { background: var(--surface); color: var(--text); }
+    .photo-admin-empty {
+      grid-column: 1 / -1;
+      text-align: center; padding: 32px; color: var(--subtle);
+      font-style: italic; font-size: .88rem;
+    }
+    .photo-progress {
+      height: 3px; background: var(--border); border-radius: 99px;
+      margin-bottom: 16px; overflow: hidden; display: none;
+    }
+    .photo-progress-bar {
+      height: 100%; background: var(--accent); border-radius: 99px;
+      transition: width .2s;
+    }
+    .photo-upload-toast {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+      border-radius: 999px; font-size: .82rem; color: var(--accent);
+      font-weight: 500; opacity: 0; transition: opacity .3s; margin-top: 14px;
+    }
+    .photo-upload-toast.show { opacity: 1; }
+
+    /* ====== RÉFÉRENCES PANEL ====== */
+    .ref-list { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+    .ref-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px; position: relative;
+      transition: border-color .15s;
+    }
+    .ref-item.inactive { opacity: .55; }
+    .ref-quote-text {
+      font-size: .95rem; font-style: italic; color: var(--text);
+      margin-bottom: 8px; line-height: 1.55;
+    }
+    .ref-meta { font-size: .82rem; color: var(--muted); font-weight: 600; }
+    .ref-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+    .ref-btn {
+      padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: none; cursor: pointer; font-size: .80rem; font-weight: 600;
+      color: var(--text); transition: background .15s;
+    }
+    .ref-btn:hover { background: var(--surface); }
+    .ref-btn.del:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+    .ref-btn.toggle-on  { color: var(--accent); border-color: var(--accent); }
+    .ref-btn.toggle-off { color: var(--muted); }
+    .ref-empty { font-size: .9rem; color: var(--muted); font-style: italic; padding: 8px 0; }
+    .ref-form { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+    .ref-form label { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
+    .ref-form label:first-child { margin-top: 0; }
+    .ref-form input, .ref-form textarea {
+      width: 100%; box-sizing: border-box; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: 7px;
+      background: var(--bg); color: var(--text); font-size: .9rem; font-family: inherit;
+      transition: border-color .15s;
+    }
+    .ref-form textarea { resize: vertical; min-height: 90px; }
+    .ref-form input:focus, .ref-form textarea:focus { outline: none; border-color: var(--accent); }
+    .ref-save-row { margin-top: 16px; display: flex; gap: 10px; }
+
+    /* ====== SÉCURITÉ ====== */
+    .pwd-form { max-width: 420px; }
+    .pwd-form .field { margin-bottom: 16px; }
+    .pwd-form label { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .pwd-input-wrap { position: relative; }
+    .pwd-form input {
+      width: 100%; box-sizing: border-box;
+      padding: 10px 40px 10px 13px;
+      border: 1px solid var(--border); border-radius: 7px;
+      background: var(--bg); color: var(--text); font-size: .92rem; font-family: inherit;
+      transition: border-color .15s;
+    }
+    .pwd-form input:focus { outline: none; border-color: var(--accent); }
+    .pwd-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px;
+      transition: color .15s;
+    }
+    .pwd-toggle:hover { color: var(--text); }
+    .pwd-strength { height: 4px; border-radius: 2px; margin-top: 6px; background: var(--border); overflow: hidden; }
+    .pwd-strength-bar { height: 100%; border-radius: 2px; transition: width .3s, background .3s; width: 0%; }
+    .pwd-strength-label { font-size: .74rem; color: var(--muted); margin-top: 4px; }
+    .pwd-match-msg { font-size: .76rem; margin-top: 4px; }
+    .pwd-rules { font-size: .78rem; color: var(--muted); margin: 10px 0 16px; line-height: 1.7; }
+    .pwd-rules li { list-style: none; padding-left: 0; }
+    .pwd-rules li::before { content: '○  '; }
+    .pwd-rules li.ok::before { content: '✓  '; color: #16a34a; }
+    .pwd-rules li.ok { color: var(--text); }
+  </style>
+</head>
+<body data-theme="editorial">
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="topbar-brand">
+        Pierre-Alexandre Normand
+        <span class="badge">Admin</span>
+      </div>
+      <div class="topbar-actions">
+        <a class="btn-view-site" href="index.html" target="_blank">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Voir le site</span>
+        </a>
+        <button class="btn-logout" id="logoutBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Déconnexion
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <!-- ===== APPARENCE ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+            Apparence
+          </h2>
+        </div>
+        <div class="panel-body">
+          <p style="color:var(--muted);margin-bottom:18px;font-size:.92rem;">Choisissez l'ambiance qui s'affichera sur l'ensemble du site :</p>
+          <div class="theme-options">
+            <button class="theme-opt" data-theme-opt="editorial">
+              <div class="theme-swatch"><div class="swatch-top swatch-editorial-top"></div><div class="swatch-bot swatch-editorial-bot"></div></div>
+              <span>Éditorial</span>
+              <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <button class="theme-opt" data-theme-opt="executive">
+              <div class="theme-swatch"><div class="swatch-top swatch-executive-top"></div><div class="swatch-bot swatch-executive-bot"></div></div>
+              <span>Exécutif</span>
+              <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <button class="theme-opt" data-theme-opt="signature">
+              <div class="theme-swatch"><div class="swatch-top swatch-signature-top"></div><div class="swatch-bot swatch-signature-bot"></div></div>
+              <span>Signature</span>
+              <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+          </div>
+          <div class="saved-toast" id="savedToast">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Ambiance sauvegardée
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BLOG ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Blog
+          </h2>
+          <button class="btn-new" id="newPostBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvel article
+          </button>
+        </div>
+
+        <div id="postsWrap"></div>
+
+        <!-- ===== FORMULAIRE ===== -->
+        <div class="form-wrap" id="postFormWrap" style="display:none;">
+          <div class="form-title" id="formHeading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Nouvel article
+          </div>
+
+          <form id="postForm" autocomplete="off">
+
+            <!-- COUVERTURE -->
+            <p class="form-section-label">Photo de couverture</p>
+            <div class="field">
+              <div class="cover-preview" id="coverPreview">
+                <div class="cover-placeholder">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>Aucune image sélectionnée</span>
+                </div>
+                <div class="cover-overlay">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Changer l'image
+                </div>
+              </div>
+              <div class="cover-row">
+                <input type="text" id="f_cover_url" placeholder="Coller une URL d'image (https://…)" />
+                <span class="cover-sep">ou</span>
+                <label class="btn-upload-cover" for="f_cover_file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Choisir un fichier
+                </label>
+                <input type="file" id="f_cover_file" accept="image/*" style="display:none" />
+                <button type="button" class="btn-remove-cover" id="removeCoverBtn">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Retirer
+                </button>
+              </div>
+            </div>
+
+            <hr class="form-divider" />
+
+            <!-- TITRES & CATÉGORIES -->
+            <p class="form-section-label">Titre &amp; catégorie</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Titre</label><input type="text" id="f_title_fr" placeholder="Titre en français" /></div>
+              <div class="field"><label>🇬🇧 Title</label><input type="text" id="f_title_en" placeholder="Title in English" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Catégorie</label><input type="text" id="f_cat_fr" placeholder="ex. Leadership, Gestion…" /></div>
+              <div class="field"><label>🇬🇧 Category</label><input type="text" id="f_cat_en" placeholder="e.g. Leadership, Management…" /></div>
+            </div>
+
+            <hr class="form-divider" />
+
+            <!-- EXTRAITS -->
+            <p class="form-section-label">Extrait (affiché sur la liste du blog)</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Extrait</label><textarea id="f_excerpt_fr" rows="3" placeholder="Courte accroche en français…"></textarea></div>
+              <div class="field"><label>🇬🇧 Excerpt</label><textarea id="f_excerpt_en" rows="3" placeholder="Short intro in English…"></textarea></div>
+            </div>
+
+            <hr class="form-divider" />
+
+            <!-- CONTENU RICHE -->
+            <p class="form-section-label">Contenu complet</p>
+            <div class="lang-tabs">
+              <button type="button" class="lang-tab-btn active" data-tab="fr">🇫🇷 Français</button>
+              <button type="button" class="lang-tab-btn" data-tab="en">🇬🇧 English</button>
+            </div>
+            <div class="lang-panel active" id="tab-fr">
+              <div id="editor-fr"></div>
+            </div>
+            <div class="lang-panel" id="tab-en">
+              <div id="editor-en"></div>
+            </div>
+
+            <hr class="form-divider" style="margin-top:20px;" />
+
+            <!-- DATE & STATUT -->
+            <p class="form-section-label">Publication</p>
+            <div class="form-cols">
+              <div class="field"><label>Date</label><input type="date" id="f_date" /></div>
+              <div class="field">
+                <label>Statut</label>
+                <select id="f_status">
+                  <option value="draft">Brouillon — non visible sur le blog</option>
+                  <option value="published">Publié — visible sur le blog</option>
+                </select>
+              </div>
+            </div>
+
+            <input type="hidden" id="f_id" />
+
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cancelBtn">Annuler</button>
+              <button type="submit" class="btn-save">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Sauvegarder
+              </button>
+            </div>
+          </form>
+        </div><!-- /form-wrap -->
+      </div><!-- /panel blog -->
+
+      <!-- ===== CV ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            CV
+          </h2>
+          <button class="btn-new" id="cvResetBtn" title="Réinitialiser avec le contenu par défaut">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Réinitialiser
+          </button>
+        </div>
+
+        <!-- Sous-onglets -->
+        <div class="cv-tabs">
+          <button type="button" class="cv-tab-btn active" onclick="cvSwitchTab(this,'contact')">Contact</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'profil')">Profil</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'experience')">Expérience</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'realisations')">Réalisations</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'formation')">Formation</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'competences')">Compétences</button>
+          <button type="button" class="cv-tab-btn" onclick="cvSwitchTab(this,'implications')">Implications</button>
+        </div>
+
+        <!-- ─── CONTACT ─── -->
+        <div class="cv-section active" id="cvs-contact">
+          <form id="cv-contact-form" autocomplete="off">
+            <div class="form-cols">
+              <div class="field"><label>Courriel</label><input type="email" id="cvc-email" placeholder="votre@courriel.com" /></div>
+              <div class="field"><label>LinkedIn URL</label><input type="url" id="cvc-linkedin" placeholder="https://linkedin.com/in/…" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>Facebook URL</label><input type="url" id="cvc-facebook" placeholder="https://facebook.com/…" /></div>
+              <div class="field"><label>Instagram URL</label><input type="url" id="cvc-instagram" placeholder="https://instagram.com/…" /></div>
+            </div>
+            <div class="form-actions"><button type="submit" class="btn-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Sauvegarder</button></div>
+          </form>
+          <div class="cv-toast" id="cv-toast-contact"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── PROFIL ─── -->
+        <div class="cv-section" id="cvs-profil">
+          <form id="cv-profil-form" autocomplete="off">
+            <p class="form-section-label">Accroche (tagline)</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Tagline</label><textarea id="cvp-tagline-fr" rows="2"></textarea></div>
+              <div class="field"><label>🇬🇧 Tagline</label><textarea id="cvp-tagline-en" rows="2"></textarea></div>
+            </div>
+            <hr class="form-divider" />
+            <p class="form-section-label">Phrase d'accroche</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Lead</label><textarea id="cvp-lead-fr" rows="3"></textarea></div>
+              <div class="field"><label>🇬🇧 Lead</label><textarea id="cvp-lead-en" rows="3"></textarea></div>
+            </div>
+            <hr class="form-divider" />
+            <p class="form-section-label">Corps du profil <small class="hint">(un paragraphe par ligne)</small></p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Paragraphes</label><textarea id="cvp-body-fr" rows="5"></textarea></div>
+              <div class="field"><label>🇬🇧 Paragraphs</label><textarea id="cvp-body-en" rows="5"></textarea></div>
+            </div>
+            <hr class="form-divider" />
+            <p class="form-section-label">Chiffres clés</p>
+            <div id="cvp-metrics-list" class="cv-list"></div>
+            <button type="button" class="cv-add-btn" id="cvp-add-metric">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter un chiffre
+            </button>
+            <div class="cv-inline-form" id="cvp-metric-form" style="display:none;margin-top:12px;">
+              <div class="cv-inline-title" id="cvp-metric-form-title">Nouveau chiffre</div>
+              <div class="form-cols">
+                <div class="field"><label>Valeur</label><input type="text" id="cvm-value" placeholder="ex. 20+" /></div>
+              </div>
+              <div class="form-cols">
+                <div class="field"><label>🇫🇷 Libellé</label><textarea id="cvm-fr" rows="2"></textarea></div>
+                <div class="field"><label>🇬🇧 Label</label><textarea id="cvm-en" rows="2"></textarea></div>
+              </div>
+              <input type="hidden" id="cvm-idx" value="-1" />
+              <div class="form-actions">
+                <button type="button" class="btn-cancel" id="cvp-metric-cancel">Annuler</button>
+                <button type="button" class="btn-save" id="cvp-metric-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>OK</button>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top:20px;"><button type="submit" class="btn-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Sauvegarder le profil</button></div>
+          </form>
+          <div class="cv-toast" id="cv-toast-profil"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── EXPÉRIENCE ─── -->
+        <div class="cv-section" id="cvs-experience">
+          <div id="cvx-list" class="cv-list"></div>
+          <button class="cv-add-btn" id="cvx-add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une expérience
+          </button>
+          <div class="cv-inline-form" id="cvx-form" style="display:none;margin-top:12px;">
+            <div class="cv-inline-title" id="cvx-form-title">Nouvelle expérience</div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Période</label><input type="text" id="cvx-period-fr" placeholder="ex. 2020 — aujourd'hui" /></div>
+              <div class="field"><label>🇬🇧 Period</label><input type="text" id="cvx-period-en" placeholder="ex. 2020 — present" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Titre du poste</label><input type="text" id="cvx-role-fr" /></div>
+              <div class="field"><label>🇬🇧 Job title</label><input type="text" id="cvx-role-en" /></div>
+            </div>
+            <div class="field"><label>Organisation</label><input type="text" id="cvx-org" placeholder="Entreprise · Lieu" /></div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Description</label><textarea id="cvx-desc-fr" rows="3"></textarea></div>
+              <div class="field"><label>🇬🇧 Description</label><textarea id="cvx-desc-en" rows="3"></textarea></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Points clés <small class="hint">(une ligne = un point)</small></label><textarea id="cvx-bullets-fr" rows="4"></textarea></div>
+              <div class="field"><label>🇬🇧 Key points <small class="hint">(one line = one point)</small></label><textarea id="cvx-bullets-en" rows="4"></textarea></div>
+            </div>
+            <input type="hidden" id="cvx-idx" value="-1" />
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cvx-cancel">Annuler</button>
+              <button type="button" class="btn-save" id="cvx-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarder</button>
+            </div>
+          </div>
+          <div class="cv-toast" id="cv-toast-experience"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── RÉALISATIONS ─── -->
+        <div class="cv-section" id="cvs-realisations">
+          <div id="cva-list" class="cv-list"></div>
+          <button class="cv-add-btn" id="cva-add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une réalisation
+          </button>
+          <div class="cv-inline-form" id="cva-form" style="display:none;margin-top:12px;">
+            <div class="cv-inline-title" id="cva-form-title">Nouvelle réalisation</div>
+            <div class="form-cols">
+              <div class="field"><label>Chiffre / Titre</label><input type="text" id="cva-num" placeholder="ex. 180 k$, Bravo, 22 500" /></div>
+              <div class="field"><label>Étiquette</label><input type="text" id="cva-tag" placeholder="ex. Bell Média · 2023" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Description</label><textarea id="cva-txt-fr" rows="3"></textarea></div>
+              <div class="field"><label>🇬🇧 Description</label><textarea id="cva-txt-en" rows="3"></textarea></div>
+            </div>
+            <input type="hidden" id="cva-idx" value="-1" />
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cva-cancel">Annuler</button>
+              <button type="button" class="btn-save" id="cva-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarder</button>
+            </div>
+          </div>
+          <div class="cv-toast" id="cv-toast-realisations"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── FORMATION ─── -->
+        <div class="cv-section" id="cvs-formation">
+          <p class="form-section-label">Diplômes</p>
+          <div id="cvd-list" class="cv-list"></div>
+          <button class="cv-add-btn" id="cvd-add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter un diplôme
+          </button>
+          <div class="cv-inline-form" id="cvd-form" style="display:none;margin-top:12px;">
+            <div class="cv-inline-title" id="cvd-form-title">Nouveau diplôme</div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Diplôme</label><input type="text" id="cvd-deg-fr" /></div>
+              <div class="field"><label>🇬🇧 Degree</label><input type="text" id="cvd-deg-en" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>Établissement</label><input type="text" id="cvd-school" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Période / statut</label><input type="text" id="cvd-when-fr" placeholder="ex. En cours, Diplomation prévue…" /></div>
+              <div class="field"><label>🇬🇧 Period / status</label><input type="text" id="cvd-when-en" placeholder="ex. In progress, Expected…" /></div>
+            </div>
+            <input type="hidden" id="cvd-idx" value="-1" />
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cvd-cancel">Annuler</button>
+              <button type="button" class="btn-save" id="cvd-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarder</button>
+            </div>
+          </div>
+
+          <hr class="form-divider" style="margin-top:24px;" />
+          <p class="form-section-label">Certifications &amp; perfectionnement</p>
+          <div id="cvc2-list" class="cv-list"></div>
+          <button class="cv-add-btn" id="cvc2-add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une certification
+          </button>
+          <div class="cv-inline-form" id="cvc2-form" style="display:none;margin-top:12px;">
+            <div class="cv-inline-title" id="cvc2-form-title">Nouvelle certification</div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Certification</label><input type="text" id="cvc2-deg-fr" /></div>
+              <div class="field"><label>🇬🇧 Certification</label><input type="text" id="cvc2-deg-en" /></div>
+            </div>
+            <div class="field"><label>Organisme</label><input type="text" id="cvc2-school" placeholder="ex. Queen's University, Certification…" /></div>
+            <input type="hidden" id="cvc2-idx" value="-1" />
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cvc2-cancel">Annuler</button>
+              <button type="button" class="btn-save" id="cvc2-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarder</button>
+            </div>
+          </div>
+          <div class="cv-toast" id="cv-toast-formation"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── COMPÉTENCES ─── -->
+        <div class="cv-section" id="cvs-competences">
+          <form id="cv-comp-form" autocomplete="off">
+            <p class="form-section-label">Compétences (hard skills)</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 <small class="hint">(une par ligne)</small></label><textarea id="cvco-skills-fr" rows="6"></textarea></div>
+              <div class="field"><label>🇬🇧 <small class="hint">(one per line)</small></label><textarea id="cvco-skills-en" rows="6"></textarea></div>
+            </div>
+            <hr class="form-divider" />
+            <p class="form-section-label">Aptitudes (qualités)</p>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 <small class="hint">(une par ligne)</small></label><textarea id="cvco-qual-fr" rows="5"></textarea></div>
+              <div class="field"><label>🇬🇧 <small class="hint">(one per line)</small></label><textarea id="cvco-qual-en" rows="5"></textarea></div>
+            </div>
+            <hr class="form-divider" />
+            <p class="form-section-label">Langues</p>
+            <div id="cvco-lang-list" class="cv-list"></div>
+            <button type="button" class="cv-add-btn" id="cvco-lang-add">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter une langue
+            </button>
+            <div class="cv-inline-form" id="cvco-lang-form" style="display:none;margin-top:12px;">
+              <div class="cv-inline-title" id="cvco-lang-form-title">Nouvelle langue</div>
+              <div class="form-cols">
+                <div class="field"><label>🇫🇷</label><input type="text" id="cvco-lang-fr" placeholder="ex. Espagnol — débutant" /></div>
+                <div class="field"><label>🇬🇧</label><input type="text" id="cvco-lang-en" placeholder="ex. Spanish — beginner" /></div>
+              </div>
+              <input type="hidden" id="cvco-lang-idx" value="-1" />
+              <div class="form-actions">
+                <button type="button" class="btn-cancel" id="cvco-lang-cancel">Annuler</button>
+                <button type="button" class="btn-save" id="cvco-lang-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>OK</button>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top:20px;"><button type="submit" class="btn-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Sauvegarder les compétences</button></div>
+          </form>
+          <div class="cv-toast" id="cv-toast-competences"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+        <!-- ─── IMPLICATIONS ─── -->
+        <div class="cv-section" id="cvs-implications">
+          <div id="cvi-list" class="cv-list"></div>
+          <button class="cv-add-btn" id="cvi-add-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter une implication
+          </button>
+          <div class="cv-inline-form" id="cvi-form" style="display:none;margin-top:12px;">
+            <div class="cv-inline-title" id="cvi-form-title">Nouvelle implication</div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Titre</label><input type="text" id="cvi-title-fr" /></div>
+              <div class="field"><label>🇬🇧 Title</label><input type="text" id="cvi-title-en" /></div>
+            </div>
+            <div class="form-cols">
+              <div class="field"><label>🇫🇷 Description / période</label><input type="text" id="cvi-meta-fr" /></div>
+              <div class="field"><label>🇬🇧 Description / period</label><input type="text" id="cvi-meta-en" /></div>
+            </div>
+            <input type="hidden" id="cvi-idx" value="-1" />
+            <div class="form-actions">
+              <button type="button" class="btn-cancel" id="cvi-cancel">Annuler</button>
+              <button type="button" class="btn-save" id="cvi-save"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarder</button>
+            </div>
+          </div>
+          <div class="cv-toast" id="cv-toast-implications"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sauvegardé</div>
+        </div>
+
+      </div><!-- /panel CV -->
+
+      <!-- ===== PHOTOS ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Photos
+          </h2>
+          <button class="btn-new" onclick="window.location.href='photos.html'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Voir l'album
+          </button>
+        </div>
+
+        <div style="padding:24px;">
+
+          <!-- Zone de dépôt -->
+          <div class="photo-drop-zone" id="photoDropZone">
+            <input type="file" id="photoFileInput" accept="image/*" multiple />
+            <div class="photo-drop-icon">📷</div>
+            <div class="photo-drop-text">Glisser des photos ici ou cliquer pour sélectionner</div>
+            <div class="photo-drop-sub">JPG, PNG, WebP, HEIC — plusieurs fichiers acceptés</div>
+          </div>
+
+          <!-- Barre de progression -->
+          <div class="photo-progress" id="photoProgress">
+            <div class="photo-progress-bar" id="photoProgressBar" style="width:0%"></div>
+          </div>
+
+          <!-- Grille des photos existantes -->
+          <div class="photo-admin-grid" id="photoAdminGrid">
+            <div class="photo-admin-empty" id="photoAdminEmpty">Aucune photo pour le moment.</div>
+          </div>
+
+          <div class="photo-upload-toast" id="photoToast">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Sauvegardé
+          </div>
+        </div>
+
+      </div><!-- /panel photos -->
+
+      <!-- ===== RÉFÉRENCES ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Références &amp; Témoignages
+          </h2>
+          <button class="btn-new" onclick="refShowForm()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nouvelle référence
+          </button>
+        </div>
+
+        <div style="padding:24px;">
+          <!-- Formulaire ajout/édition -->
+          <div class="ref-form" id="refForm" style="display:none;">
+            <label>Citation / Témoignage *</label>
+            <textarea id="refQuoteInput" placeholder="« Ce que la personne dit de vous… »"></textarea>
+            <label>Nom complet *</label>
+            <input type="text" id="refNameInput" placeholder="Marie Dupont" />
+            <label>Titre &amp; Organisation</label>
+            <input type="text" id="refTitleInput" placeholder="Directrice, Exemple inc." />
+            <div class="ref-save-row">
+              <button class="btn-new" onclick="refSave()">&#10003; Enregistrer</button>
+              <button class="btn-new" onclick="refClearForm()" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);">Annuler</button>
+            </div>
+          </div>
+
+          <!-- Liste des références -->
+          <div class="ref-list" id="refList">
+            <div class="ref-empty" id="refEmpty">Aucune référence pour le moment.</div>
+          </div>
+        </div>
+
+      </div><!-- /panel références -->
+
+
+      <!-- ===== À PROPOS ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            À propos
+          </h2>
+          <a href="apropos.html" target="_blank" class="btn-secondary" style="font-size:.82rem;padding:6px 14px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Voir la page
+          </a>
+        </div>
+        <div style="padding:24px;">
+
+          <!-- Photo de profil -->
+          <div class="field" style="margin-bottom:24px;">
+            <label>Photo de profil</label>
+            <div style="display:flex;align-items:center;gap:20px;margin-top:8px;">
+              <div id="apPhotoPreview" style="width:90px;height:90px;border-radius:50%;background:var(--surface-raised);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </div>
+              <div>
+                <label class="btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:.82rem;padding:7px 14px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Choisir une photo
+                  <input type="file" id="apPhotoInput" accept="image/*" style="display:none;" onchange="apPhotoSelected(this)">
+                </label>
+                <button class="btn-secondary" onclick="apPhotoRemove()" style="font-size:.82rem;padding:7px 14px;margin-left:8px;color:var(--muted);">Retirer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sous-titre FR / EN -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div class="field">
+              <label>Sous-titre (FR)</label>
+              <input type="text" id="apSubtitleFr" placeholder="ex: Directeur des opérations" style="width:100%;" />
+            </div>
+            <div class="field">
+              <label>Sous-titre (EN)</label>
+              <input type="text" id="apSubtitleEn" placeholder="ex: Chief Operating Officer" style="width:100%;" />
+            </div>
+          </div>
+
+          <!-- Biographie FR -->
+          <div class="field" style="margin-bottom:16px;">
+            <label>Biographie (FR)</label>
+            <textarea id="apBioFr" rows="6" placeholder="Votre biographie en français..." style="width:100%;resize:vertical;font-family:inherit;font-size:.9rem;padding:10px;background:var(--surface-raised);border:1.5px solid var(--border);border-radius:8px;color:var(--text);line-height:1.6;"></textarea>
+            <div style="font-size:.76rem;color:var(--muted);margin-top:4px;">Séparez les paragraphes par une ligne vide.</div>
+          </div>
+
+          <!-- Biographie EN -->
+          <div class="field" style="margin-bottom:16px;">
+            <label>Biographie (EN)</label>
+            <textarea id="apBioEn" rows="6" placeholder="Your biography in English..." style="width:100%;resize:vertical;font-family:inherit;font-size:.9rem;padding:10px;background:var(--surface-raised);border:1.5px solid var(--border);border-radius:8px;color:var(--text);line-height:1.6;"></textarea>
+            <div style="font-size:.76rem;color:var(--muted);margin-top:4px;">Separate paragraphs with a blank line.</div>
+          </div>
+
+          <!-- Tags -->
+          <div class="field" style="margin-bottom:24px;">
+            <label>Étiquettes / Tags</label>
+            <input type="text" id="apTags" placeholder="ex: Stratégie, Leadership, Innovation" style="width:100%;" />
+            <div style="font-size:.76rem;color:var(--muted);margin-top:4px;">Séparez les tags par une virgule.</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button class="btn-new" onclick="apSave()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Sauvegarder
+            </button>
+            <div id="apSavedMsg" style="font-size:.85rem;color:#16a34a;display:none;">✓ Sauvegardé</div>
+          </div>
+        </div>
+      </div><!-- /panel à propos -->
+
+
+      <!-- ===== SAUVEGARDE ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Sauvegarde &amp; Restauration
+          </h2>
+        </div>
+        <div style="padding:24px;">
+          <p style="color:var(--muted);font-size:.92rem;margin-bottom:24px;line-height:1.6;">
+            Exportez l'ensemble de vos données (blog, CV, photos, références, À propos) dans un fichier de sauvegarde. Importez ce fichier pour restaurer vos données sur un autre appareil ou après une réinitialisation.
+          </p>
+
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px;">
+            <!-- Export -->
+            <div style="flex:1;min-width:220px;background:var(--surface-raised);border:1.5px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exporter
+              </div>
+              <p style="font-size:.84rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Télécharge un fichier <code>.json</code> contenant toutes vos données.</p>
+              <button class="btn-new" onclick="backupExport()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Télécharger la sauvegarde
+              </button>
+            </div>
+
+            <!-- Import -->
+            <div style="flex:1;min-width:220px;background:var(--surface-raised);border:1.5px solid var(--border);border-radius:12px;padding:20px;">
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Importer
+              </div>
+              <p style="font-size:.84rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Restaure toutes vos données depuis un fichier de sauvegarde.</p>
+              <label class="btn-new" style="cursor:pointer;display:inline-flex;align-items:center;gap:7px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Choisir un fichier…
+                <input type="file" id="backupFileInput" accept=".json" style="display:none;" onchange="backupImport(this)">
+              </label>
+            </div>
+          </div>
+
+          <div id="backupMsg" style="display:none;padding:12px 16px;border-radius:8px;font-size:.88rem;"></div>
+        </div>
+      </div><!-- /panel sauvegarde -->
+
+      <!-- ===== SÉCURITÉ ===== -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Sécurité — Mot de passe
+          </h2>
+        </div>
+        <div style="padding:24px;">
+          <div class="pwd-form" id="pwdChangeForm">
+            <div class="field">
+              <label>Mot de passe actuel</label>
+              <div class="pwd-input-wrap">
+                <input type="password" id="pwdCurrent" placeholder="••••••••" autocomplete="current-password" />
+                <button type="button" class="pwd-toggle" onclick="pwdToggleVis('pwdCurrent',this)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="field">
+              <label>Nouveau mot de passe</label>
+              <div class="pwd-input-wrap">
+                <input type="password" id="pwdNew" placeholder="Minimum 8 caractères" autocomplete="new-password" oninput="pwdCheckStrength()" />
+                <button type="button" class="pwd-toggle" onclick="pwdToggleVis('pwdNew',this)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="pwd-strength"><div class="pwd-strength-bar" id="pwdStrBar"></div></div>
+              <div class="pwd-strength-label" id="pwdStrLabel"></div>
+              <ul class="pwd-rules" id="pwdRules">
+                <li id="rLen">8 caractères minimum</li>
+                <li id="rUpper">Une lettre majuscule</li>
+                <li id="rNum">Un chiffre</li>
+                <li id="rSpecial">Un caractère spécial (!@#$…)</li>
+              </ul>
+            </div>
+            <div class="field">
+              <label>Confirmer le nouveau mot de passe</label>
+              <div class="pwd-input-wrap">
+                <input type="password" id="pwdConfirm" placeholder="••••••••" autocomplete="new-password" oninput="pwdCheckMatch()" />
+                <button type="button" class="pwd-toggle" onclick="pwdToggleVis('pwdConfirm',this)">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="pwd-match-msg" id="pwdMatchMsg"></div>
+            </div>
+            <button class="btn-new" id="pwdSaveBtn" onclick="pwdSave()" style="margin-top:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Changer le mot de passe
+            </button>
+            <div id="pwdMsg" style="margin-top:12px;font-size:.88rem;display:none;"></div>
+          </div>
+        </div>
+      </div><!-- /panel sécurité -->
+
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <script>
+    // ====== AUTH ======
+    if (sessionStorage.getItem('pa-admin-auth') !== '1') window.location.replace('login.html');
+
+    // ====== THÈME ======
+    let currentTheme = localStorage.getItem('pa-theme') || 'editorial';
+    document.body.dataset.theme = currentTheme;
+    const themeOpts = document.querySelectorAll('[data-theme-opt]');
+    function syncTheme(t) { themeOpts.forEach(b => b.classList.toggle('is-active', b.dataset.themeOpt === t)); }
+    syncTheme(currentTheme);
+    themeOpts.forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentTheme = btn.dataset.themeOpt;
+        document.body.dataset.theme = currentTheme;
+        localStorage.setItem('pa-theme', currentTheme);
+        syncTheme(currentTheme);
+        const t = document.getElementById('savedToast');
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2200);
+      });
+    });
+
+    // ====== DÉCONNEXION ======
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('pa-admin-auth');
+      window.location.replace('index.html');
+    });
+
+    // ====== QUILL — initialisation différée ======
+    let quillFR = null, quillEN = null;
+
+    const Font = Quill.import('formats/font');
+    Font.whitelist = ['serif', 'mono'];
+    Quill.register(Font, true);
+
+    const toolbarOptions = [
+      [{ header: [1, 2, 3, false] }],
+      [{ font: ['', 'serif', 'mono'] }],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }, 'blockquote'],
+      ['link', 'image', 'video'],
+      ['clean']
+    ];
+
+    function makeImageHandler(quill) {
+      return function() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+        input.onchange = () => {
+          const file = input.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const range = quill.getSelection(true);
+            quill.insertEmbed(range.index, 'image', reader.result, Quill.sources.USER);
+            quill.setSelection(range.index + 1, Quill.sources.SILENT);
+          };
+          reader.readAsDataURL(file);
+        };
+      };
+    }
+
+    function initQuill() {
+      if (quillFR) return;
+      const cfg = (id) => ({
+        theme: 'snow',
+        modules: {
+          toolbar: { container: toolbarOptions, handlers: {} }
+        },
+        placeholder: id === 'editor-fr' ? 'Rédigez le contenu en français…' : 'Write the content in English…'
+      });
+      quillFR = new Quill('#editor-fr', cfg('editor-fr'));
+      quillEN = new Quill('#editor-en', cfg('editor-en'));
+      // Custom image handler (base64 upload)
+      quillFR.getModule('toolbar').addHandler('image', makeImageHandler(quillFR));
+      quillEN.getModule('toolbar').addHandler('image', makeImageHandler(quillEN));
+    }
+
+    // ====== COUVERTURE ======
+    let currentCover = '';
+
+    function setCover(src) {
+      currentCover = src || '';
+      const el = document.getElementById('coverPreview');
+      if (currentCover) {
+        el.style.backgroundImage = `url('${currentCover.replace(/'/g, "\\'")}')`;
+        el.classList.add('has-image');
+      } else {
+        el.style.backgroundImage = '';
+        el.classList.remove('has-image');
+      }
+      // Only set URL field if it's not a base64 string
+      document.getElementById('f_cover_url').value = currentCover.startsWith('data:') ? '' : currentCover;
+    }
+
+    document.getElementById('f_cover_url').addEventListener('input', function() {
+      const v = this.value.trim();
+      if (v) {
+        currentCover = v;
+        const el = document.getElementById('coverPreview');
+        el.style.backgroundImage = `url('${v}')`;
+        el.classList.add('has-image');
+      } else {
+        setCover('');
+      }
+    });
+
+    document.getElementById('f_cover_file').addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => setCover(e.target.result);
+      reader.readAsDataURL(file);
+      this.value = '';
+    });
+
+    document.getElementById('removeCoverBtn').addEventListener('click', () => setCover(''));
+
+    // Click on cover preview also triggers file picker
+    document.getElementById('coverPreview').addEventListener('click', () => {
+      document.getElementById('f_cover_file').click();
+    });
+
+    // ====== ONGLETS FR/EN ======
+    document.querySelectorAll('.lang-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.lang-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        // Ensure Quill refreshes after becoming visible
+        if (btn.dataset.tab === 'en' && quillEN) quillEN.update();
+        if (btn.dataset.tab === 'fr' && quillFR) quillFR.update();
+      });
+    });
+
+    // ====== BLOG ======
+    let posts = [];
+    let editingId = null;
+
+    const DEMO_POSTS = [
+      { id: 'demo1', title_fr: "Conseiller politique : naviguer entre l'urgence et la nuance", title_en: "Political advisor: navigating urgency and nuance",
+        cat_fr: 'Gouvernance', cat_en: 'Governance',
+        excerpt_fr: "Entre la pression des dossiers urgents et la nécessité de prendre du recul, le rôle de conseiller politique exige une agilité intellectuelle constante.",
+        excerpt_en: "Between urgent file pressure and the need for perspective, the role of political advisor demands constant intellectual agility.",
+        content_fr: '', content_en: '', date: '2025-09-15', status: 'published', cover: '' },
+      { id: 'demo2', title_fr: "Leadership en temps de restructuration : leçons d'une décennie chez Bell Média", title_en: "Leadership in restructuring: lessons from a decade at Bell Media",
+        cat_fr: 'Leadership', cat_en: 'Leadership',
+        excerpt_fr: "Diriger une équipe de 30 personnes à travers des transformations majeures — fermetures, fusions, changements de cap — m'a appris que la transparence est le seul vrai capital en période de turbulences.",
+        excerpt_en: "Leading a team of 30 through major transformations taught me that transparency is the only real capital during turbulent times.",
+        content_fr: '', content_en: '', date: '2024-11-02', status: 'published', cover: '' },
+      { id: 'demo3', title_fr: "Communications stratégiques : l'art de simplifier le complexe", title_en: "Strategic communications: the art of simplifying complexity",
+        cat_fr: 'Communications', cat_en: 'Communications',
+        excerpt_fr: "Dans un environnement médiatique saturé, la capacité à distiller un message clair et percutant est devenue une compétence différenciatrice pour tout gestionnaire.",
+        excerpt_en: "In a saturated media environment, the ability to distill a clear and impactful message has become a key differentiator for managers.",
+        content_fr: '', content_en: '', date: '2024-06-18', status: 'published', cover: '' },
+    ];
+
+    function loadPosts() {
+      try { posts = JSON.parse(localStorage.getItem('pa-blog-posts') || '[]'); } catch(e) { posts = []; }
+      if (!posts.length) {
+        posts = JSON.parse(JSON.stringify(DEMO_POSTS));
+        savePosts();
+      }
+    }
+    function savePosts()  { localStorage.setItem('pa-blog-posts', JSON.stringify(posts)); }
+    function fmtDate(d)   { if (!d) return '—'; return new Date(d + 'T12:00:00').toLocaleDateString('fr-CA', { year:'numeric', month:'short', day:'numeric' }); }
+
+    function renderPosts() {
+      const wrap = document.getElementById('postsWrap');
+      if (!posts.length) {
+        wrap.innerHTML = '<div class="empty-state">Aucun article pour l\'instant.<br>Cliquez sur <strong>+ Nouvel article</strong> pour commencer.</div>';
+        return;
+      }
+      const rows = posts.map(p => `
+        <tr>
+          <td style="max-width:300px;">
+            ${p.cover ? `<img src="${p.cover}" style="width:48px;height:32px;object-fit:cover;border-radius:3px;margin-right:10px;vertical-align:middle;border:1px solid var(--border)" alt="" />` : ''}
+            <strong style="color:var(--text);vertical-align:middle">${p.title_fr || '<em style="color:var(--subtle)">Sans titre</em>'}</strong>
+          </td>
+          <td style="white-space:nowrap;color:var(--muted)">${fmtDate(p.date)}</td>
+          <td><span class="badge-pub ${p.status}">${p.status === 'published' ? 'Publié' : 'Brouillon'}</span></td>
+          <td style="white-space:nowrap">
+            <button class="act-btn" onclick="openEdit('${p.id}')" title="Modifier">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="act-btn danger" onclick="deletePost('${p.id}')" title="Supprimer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </td>
+        </tr>`).join('');
+      wrap.innerHTML = `<table class="posts-table"><thead><tr><th>Article</th><th>Date</th><th>Statut</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function showForm() {
+      document.getElementById('postFormWrap').style.display = 'block';
+      initQuill(); // lazy init
+      document.getElementById('postFormWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function hideForm() {
+      document.getElementById('postFormWrap').style.display = 'none';
+      editingId = null;
+    }
+
+    function openNew() {
+      editingId = null;
+      document.getElementById('formHeading').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nouvel article`;
+      document.getElementById('f_id').value = '';
+      ['f_title_fr','f_title_en','f_cat_fr','f_cat_en','f_excerpt_fr','f_excerpt_en'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f_date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('f_status').value = 'draft';
+      setCover('');
+      showForm();
+      quillFR.setContents([{ insert: '\n' }], 'silent');
+      quillEN.setContents([{ insert: '\n' }], 'silent');
+    }
+
+    function openEdit(id) {
+      const p = posts.find(x => x.id === id);
+      if (!p) return;
+      editingId = id;
+      document.getElementById('formHeading').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifier l'article`;
+      document.getElementById('f_id').value = p.id;
+      document.getElementById('f_title_fr').value = p.title_fr || '';
+      document.getElementById('f_title_en').value = p.title_en || '';
+      document.getElementById('f_cat_fr').value   = p.cat_fr   || '';
+      document.getElementById('f_cat_en').value   = p.cat_en   || '';
+      document.getElementById('f_excerpt_fr').value = p.excerpt_fr || '';
+      document.getElementById('f_excerpt_en').value = p.excerpt_en || '';
+      document.getElementById('f_date').value   = p.date   || '';
+      document.getElementById('f_status').value = p.status || 'draft';
+      setCover(p.cover || '');
+      showForm();
+      quillFR.setContents(quillFR.clipboard.convert(p.content_fr || ''), 'silent');
+      quillEN.setContents(quillEN.clipboard.convert(p.content_en || ''), 'silent');
+    }
+
+    function deletePost(id) {
+      const p = posts.find(x => x.id === id);
+      if (confirm(`Supprimer « ${p ? p.title_fr || 'cet article' : 'cet article'} » ?\nCette action est irréversible.`)) {
+        posts = posts.filter(x => x.id !== id);
+        savePosts(); renderPosts(); hideForm();
+      }
+    }
+
+    document.getElementById('newPostBtn').addEventListener('click', openNew);
+    document.getElementById('cancelBtn').addEventListener('click', hideForm);
+
+    document.getElementById('postForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const isEmpty = h => !h || h === '<p><br></p>';
+      const id = editingId || Date.now().toString();
+      const data = {
+        id,
+        cover:      currentCover,
+        title_fr:   document.getElementById('f_title_fr').value.trim(),
+        title_en:   document.getElementById('f_title_en').value.trim(),
+        cat_fr:     document.getElementById('f_cat_fr').value.trim(),
+        cat_en:     document.getElementById('f_cat_en').value.trim(),
+        excerpt_fr: document.getElementById('f_excerpt_fr').value.trim(),
+        excerpt_en: document.getElementById('f_excerpt_en').value.trim(),
+        content_fr: isEmpty(quillFR.root.innerHTML) ? '' : quillFR.root.innerHTML,
+        content_en: isEmpty(quillEN.root.innerHTML) ? '' : quillEN.root.innerHTML,
+        date:       document.getElementById('f_date').value,
+        status:     document.getElementById('f_status').value,
+      };
+      if (editingId) {
+        const idx = posts.findIndex(x => x.id === editingId);
+        if (idx !== -1) posts[idx] = data; else posts.unshift(data);
+      } else {
+        posts.unshift(data);
+      }
+      savePosts(); renderPosts(); hideForm();
+    });
+
+    // ====== INIT ======
+    loadPosts();
+    renderPosts();
+
+    // ======================================================
+    // ====== CV EDITOR =====================================
+    // ======================================================
+
+    const CV_DEFAULTS = {
+      tagline: {
+        fr: "Gestionnaire et leader d'équipe — 20+ années en communications, gouvernance et organisation événementielle.",
+        en: "Manager and team leader — 20+ years in communications, governance, and event organization."
+      },
+      profileLead: {
+        fr: "Communicateur aguerri, reconnu pour son <span class=\"accent\">aisance relationnelle</span> et sa capacité à consolider des équipes collaboratives et efficientes.",
+        en: "A seasoned communicator, recognized for his <span class=\"accent\">interpersonal ease</span> and his ability to build collaborative, high-performing teams."
+      },
+      profileBody: {
+        fr: [
+          "Plus de vingt années d'expérience au sein de grandes entreprises des domaines des communications et de l'organisation événementielle, dont près d'une décennie à la direction de la programmation chez Bell Média, puis des mandats de conseil stratégique auprès du Conseil en éducation des Premières Nations, du MAPAQ et du MRNF.",
+          "Compétence avérée en management et en service client, capable de cerner les enjeux potentiels et faisant preuve d'adaptabilité dans un environnement en mutation rapide et constante. J'aspire à poursuivre mon parcours en contribuant au succès d'une organisation réputée."
+        ],
+        en: [
+          "Over twenty years of experience with major organizations in communications and event management, including nearly a decade leading programming at Bell Media, followed by strategic advisory roles with the First Nations Education Council, MAPAQ, and MRNF.",
+          "Proven expertise in management and client service, with a sharp eye for emerging issues and strong adaptability in fast-moving environments. I aim to continue contributing to the success of a respected organization."
+        ]
+      },
+      metrics: [
+        {value:"20+", fr:"années d'expérience en communications et gestion", en:"years of experience in communications and management"},
+        {value:"180 k$", fr:"d'économies générées par la restructuration de 3 stations radio", en:"in savings from the restructuring of 3 radio stations"},
+        {value:"22 500", fr:"auditeurs au quart d'heure — record Rouge FM Québec (2023)", en:"listeners per quarter hour — Rouge FM Québec record (2023)"},
+        {value:"400+", fr:"événements animés, des galas corporatifs aux levées de fonds", en:"events hosted, from corporate galas to fundraisers"}
+      ],
+      experience: [
+        {period_fr:"Sept. 2025 — aujourd'hui", period_en:"Sept. 2025 — present", role_fr:"Directeur de cabinet adjoint", role_en:"Deputy Chief of Staff", org:"MRNF · Capitale-Nationale", desc_fr:"Soutien stratégique à la direction de cabinet dans la coordination des dossiers politiques et administratifs de la Capitale-Nationale.", desc_en:"Strategic support to the Chief of Staff, coordinating political and administrative files for the Capitale-Nationale region.", bullets_fr:[], bullets_en:[]},
+        {period_fr:"Fév. — sept. 2025", period_en:"Feb. — Sept. 2025", role_fr:"Conseiller politique", role_en:"Political Advisor", org:"MAPAQ — Ministère de l'Agriculture, des Pêcheries et de l'Alimentation", desc_fr:"Mandat de conseil stratégique auprès de la direction, analyse des enjeux sectoriels et accompagnement des décisions politiques.", desc_en:"Strategic advisory mandate with leadership — sector analysis and support on policy decisions.", bullets_fr:[], bullets_en:[]},
+        {period_fr:"2024 — 2025", period_en:"2024 — 2025", role_fr:"Conseiller aux opérations — Maison des savoirs", role_en:"Operations Advisor — Maison des savoirs", org:"Conseil en éducation des Premières Nations (CEPN)", desc_fr:"Mandat de développement d'un projet universitaire à mission autochtone pour le Gouvernement du Québec.", desc_en:"Mandate to develop a First Nations-focused university project for the Government of Québec.", bullets_fr:["<strong>Conceptualiser et rédiger le plan d'affaires</strong> exigé par le Gouvernement du Québec pour la mise sur pied d'une université avec une mission axée sur les Premières Nations.","Conception et actualisation d'un tableau de bord, création des outils collaboratifs, coordination des comités, reporting mensuel."], bullets_en:["<strong>Designed and drafted the business plan</strong> required by the Government of Québec to establish a First Nations-focused university.","Built and maintained the project dashboard, collaborative tools, committee coordination and monthly reporting."]},
+        {period_fr:"2017 — 2024", period_en:"2017 — 2024", role_fr:"Gestionnaire — Directeur de la programmation", role_en:"Manager — Director of Programming", org:"Bell Média — Radio, Québec et Bas-Saint-Laurent", desc_fr:"Membre de l'équipe de direction provinciale, relevant de la directrice générale radio de langue française, en charge d'une équipe de 30 employés.", desc_en:"Member of the provincial leadership team, reporting to the General Manager of French-language radio, leading a team of 30 employees.", bullets_fr:["<strong>Plan de restructuration de 3 stations du Bas-Saint-Laurent</strong> — 180 000 $ d'économies, puis revente à Arsenal Média (février 2024).","<strong>Système RH unifié</strong> — processus informatisé pour les remplacements, distingué par le prix « Bravo » de Bell Média.","<strong>Auditoire record</strong> — 22 500 personnes au quart d'heure en 2023 sur Rouge FM Québec.","Méthode de recherche de contenus déployée sur les 21 stations du réseau — <strong>−15 % de temps de préparation</strong>.","Élaboration du plan stratégique, dotation, supervision des opérations, contrôle financier, négociation des partenariats."], bullets_en:["<strong>Restructuring plan for 3 Bas-Saint-Laurent stations</strong> — $180,000 in savings, followed by the sale to Arsenal Media (February 2024).","<strong>Unified HR system</strong> — recognized with Bell Media's \"Bravo\" award.","<strong>Record audience</strong> — 22,500 listeners per quarter hour in 2023 on Rouge FM Québec.","Content research method rolled out across 21 network stations — <strong>−15 % in prep time</strong>.","Strategic planning, staffing, operations oversight, financial control, and partnership negotiation."]},
+        {period_fr:"2008 — aujourd'hui", period_en:"2008 — present", role_fr:"Propriétaire", role_en:"Owner", org:"Devincie Animations inc. — Victoriaville", desc_fr:"Entreprise d'organisation et d'animation d'événements : partys corporatifs, levées de fonds, congrès, mariages, bals de finissants.", desc_en:"Event organization and hosting company: corporate parties, fundraisers, conferences, weddings, graduation balls.", bullets_fr:["Développement des axes stratégiques avec les partenaires; coordination logistique, technique, matérielle et humaine.","<strong>Plus de 400 événements animés</strong> — promotion, négociation, coordination et gestion budgétaire."], bullets_en:["Strategic development with partners; end-to-end logistics, technical and human coordination.","<strong>More than 400 events hosted</strong> — promotion, negotiation, coordination and budget management."]},
+        {period_fr:"2004 — 2017", period_en:"2004 — 2017", role_fr:"Animateur radio — émissions matinales", role_en:"Radio Host — morning shows", org:"Québec 98.9 Énergie · 107.5 Rouge · Sherbrooke 93.7 Rythme FM · Victoriaville 97.3 O · 101.9 Passion Rock", desc_fr:"Treize années d'antenne quotidienne sur les marchés de Québec, Sherbrooke et Victoriaville.", desc_en:"Thirteen years of daily broadcasting across the Québec, Sherbrooke and Victoriaville markets.", bullets_fr:[], bullets_en:[]}
+      ],
+      achievements: [
+        {num:"180 k$", txt_fr:"Plan de restructuration des 3 stations radios du Bas-Saint-Laurent — économies dégagées et revente à Arsenal Média en février 2024.", txt_en:"Restructuring plan for the 3 Bas-Saint-Laurent radio stations — savings generated and sale to Arsenal Media in February 2024.", tag:"Bell Média · 2023-24"},
+        {num:"Bravo", txt_fr:"Système informatisé unifiant le processus de remplacements RH — distingué par la reconnaissance « Bravo » de Bell Média.", txt_en:"Computerized system unifying HR replacement processes — recognized with Bell Media's \"Bravo\" award.", tag:"Bell Média"},
+        {num:"22 500", txt_fr:"Auditoire record au quart d'heure sur Rouge FM Québec en 2023.", txt_en:"Record quarter-hour audience on Rouge FM Québec in 2023.", tag:"Rouge FM · 2023"},
+        {num:"75", txt_fr:"Employés formés au siège social de la Banque Nationale au programme « Apprentissage des objections par l'improvisation ».", txt_en:"Head-office employees trained at National Bank with the program \"Handling objections through improvisation\".", tag:"Banque Nationale"},
+        {num:"21", txt_fr:"Stations de radio bénéficiant d'une nouvelle méthode de recherche de contenus — −15 % de temps de préparation.", txt_en:"Radio stations benefiting from a new content research method — −15 % in preparation time.", tag:"Bell Média Radio"},
+        {num:"8", txt_fr:"Éditions du tournoi provincial Le Grand Week-end d'improvisation — 210 joueurs et 150 bénévoles.", txt_en:"Editions of the provincial tournament Le Grand Week-end d'improvisation — 210 players and 150 volunteers.", tag:"Victoriaville"}
+      ],
+      education: {
+        degrees: [
+          {deg_fr:"Executive MBA — Gestion pour cadres en exercice", deg_en:"Executive MBA — Management for Active Executives", school:"Université Laval", when_fr:"Diplomation prévue avril 2027", when_en:"Expected completion: April 2027"},
+          {deg_fr:"Maîtrise en administration publique — Profil gestionnaire", deg_en:"Master's in Public Administration — Management track", school:"École nationale d'administration publique (ENAP)", when_fr:"En cours", when_en:"In progress"},
+          {deg_fr:"Baccalauréat en administration des affaires", deg_en:"Bachelor of Business Administration", school:"Université du Québec — TÉLUQ", when_fr:"", when_en:""}
+        ],
+        certs: [
+          {deg_fr:"Leadership en santé mentale au travail", deg_en:"Workplace Mental Health Leadership", school:"Queen's University"},
+          {deg_fr:"Six Sigma — Ceinture verte", deg_en:"Six Sigma — Green Belt", school:"Certification"},
+          {deg_fr:"Chef de projet — Microsoft", deg_en:"Project Manager — Microsoft", school:"Certification"},
+          {deg_fr:"Google Project Management", deg_en:"Google Project Management", school:"Certification"}
+        ]
+      },
+      skills: {
+        fr:["Leadership participatif","Coaching","Communication","Management","Négociation","Gestion de crise","Analyse stratégique","Finance & comptabilité","Gouvernance"],
+        en:["Participative leadership","Coaching","Communication","Management","Negotiation","Crisis management","Strategic analysis","Finance & accounting","Governance"]
+      },
+      qualities: {
+        fr:["Collaboratif","Proactif","Adaptatif","Créatif","Diplomate","Rassembleur","Fiable","Audacieux","Accessible","Curieux"],
+        en:["Collaborative","Proactive","Adaptive","Creative","Diplomatic","Unifier","Reliable","Bold","Approachable","Curious"]
+      },
+      languages: [
+        {fr:"Français — langue maternelle", en:"French — native"},
+        {fr:"Anglais — fonctionnel", en:"English — working proficiency"}
+      ],
+      implications: [
+        {title_fr:"Maître de cérémonie", title_en:"Master of Ceremonies", meta_fr:"Soirée reconnaissance Bénévole Québec · 2019 — aujourd'hui", meta_en:"Bénévole Québec recognition evening · 2019 — present"},
+        {title_fr:"Annonceur maison", title_en:"In-house Announcer", meta_fr:"Vulkins — équipe de football collégiale, Victoriaville · 2016 — aujourd'hui", meta_en:"Vulkins — collegiate football team, Victoriaville · 2016 — present"},
+        {title_fr:"Président — Conseil d'administration", title_en:"Chair — Board of Directors", meta_fr:"Le Grand Week-end d'improvisation, Victoriaville · 2006 — 2019", meta_en:"Le Grand Week-end d'improvisation, Victoriaville · 2006 — 2019"},
+        {title_fr:"Président — Conseil d'administration", title_en:"Chair — Board of Directors", meta_fr:"Ligue d'improvisation LIVE, Victoriaville · 2006 — 2011", meta_en:"LIVE improv league, Victoriaville · 2006 — 2011"},
+        {title_fr:"Président — Conseil d'administration", title_en:"Chair — Board of Directors", meta_fr:"Centre communautaire d'Arthabaska, Victoriaville · 2007 — 2009", meta_en:"Arthabaska Community Centre, Victoriaville · 2007 — 2009"},
+        {title_fr:"Centres d'intérêt", title_en:"Interests", meta_fr:"Nouvelles technologies · Documentaires · Politique · Jeux vidéo · Baseball · Golf", meta_en:"Technology · Documentaries · Politics · Video games · Baseball · Golf"}
+      ],
+      contact: {email:"panormand@ccapcable.com", linkedin:"https://www.linkedin.com/in/panormand/", facebook:"https://www.facebook.com/panormand", instagram:"https://www.instagram.com/panormand"}
+    };
+
+    // ── Data helpers ──────────────────────────────────────
+    let cvData = JSON.parse(JSON.stringify(CV_DEFAULTS));
+
+    function loadCVData() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('pa-cv-data') || 'null');
+        if (!saved) return;
+        const base = JSON.parse(JSON.stringify(CV_DEFAULTS));
+        for (const key of Object.keys(saved)) {
+          const sv = saved[key];
+          if (key === 'education') {
+            // Objet imbriqué avec deux tableaux
+            if (sv && typeof sv === 'object') {
+              base.education = {
+                degrees: (sv.degrees && sv.degrees.length > 0) ? sv.degrees : base.education.degrees,
+                certs:   (sv.certs   && sv.certs.length   > 0) ? sv.certs   : base.education.certs
+              };
+            }
+          } else if (Array.isArray(sv)) {
+            // Pour les sections en liste : n'utiliser la sauvegarde que si elle est non-vide.
+            // Si un ancien localStorage avait des tableaux vides (version précédente), on conserve les
+            // données par défaut du site afin que le contenu existant reste visible et modifiable.
+            if (sv.length > 0) base[key] = sv;
+          } else if (sv !== null && sv !== undefined) {
+            base[key] = sv;
+          }
+        }
+        cvData = base;
+      } catch(e) {}
+    }
+
+    function saveCVData() {
+      localStorage.setItem('pa-cv-data', JSON.stringify(cvData));
+    }
+
+    function showCVToast(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    const stripHTML = s => s.replace(/<[^>]*>/g, '');
+
+    // ── Tabs ──────────────────────────────────────────────
+    function cvSwitchTab(btn, tab) {
+      document.querySelectorAll('.cv-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.cv-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      var target = document.getElementById('cvs-' + tab);
+      if (target) target.classList.add('active');
+    }
+
+    // ── Réinitialiser ─────────────────────────────────────
+    document.getElementById('cvResetBtn').addEventListener('click', () => {
+      if (!confirm('Réinitialiser tout le CV avec le contenu par défaut ?\nVos modifications seront perdues.')) return;
+      cvData = JSON.parse(JSON.stringify(CV_DEFAULTS));
+      saveCVData();
+      loadCVAllForms();
+      showCVToast('cv-toast-contact');
+    });
+
+    // ── Generic list helpers ──────────────────────────────
+    function makeListActions(idx, editFn, deleteFn, moveFn, total) {
+      return `
+        ${idx > 0 ? `<button class="cv-act ord" onclick="${moveFn}(${idx},-1)" title="Monter">▲</button>` : '<span style="width:24px;display:inline-block"></span>'}
+        ${idx < total-1 ? `<button class="cv-act ord" onclick="${moveFn}(${idx},1)" title="Descendre">▼</button>` : '<span style="width:24px;display:inline-block"></span>'}
+        <button class="cv-act" onclick="${editFn}(${idx})" title="Modifier">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="cv-act danger" onclick="${deleteFn}(${idx})" title="Supprimer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>`;
+    }
+
+    // ── CONTACT ───────────────────────────────────────────
+    function loadContactForm() {
+      const c = cvData.contact || {};
+      document.getElementById('cvc-email').value    = c.email    || '';
+      document.getElementById('cvc-linkedin').value = c.linkedin || '';
+      document.getElementById('cvc-facebook').value = c.facebook || '';
+      document.getElementById('cvc-instagram').value= c.instagram|| '';
+    }
+    document.getElementById('cv-contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      cvData.contact = {
+        email:    document.getElementById('cvc-email').value.trim(),
+        linkedin: document.getElementById('cvc-linkedin').value.trim(),
+        facebook: document.getElementById('cvc-facebook').value.trim(),
+        instagram:document.getElementById('cvc-instagram').value.trim()
+      };
+      saveCVData();
+      showCVToast('cv-toast-contact');
+    });
+
+    // ── PROFIL ────────────────────────────────────────────
+    function loadProfilForm() {
+      const t = cvData.tagline || {};
+      const l = cvData.profileLead || {};
+      const b = cvData.profileBody || {};
+      document.getElementById('cvp-tagline-fr').value = t.fr || '';
+      document.getElementById('cvp-tagline-en').value = t.en || '';
+      document.getElementById('cvp-lead-fr').value = stripHTML(l.fr || '');
+      document.getElementById('cvp-lead-en').value = stripHTML(l.en || '');
+      document.getElementById('cvp-body-fr').value = (b.fr || []).join('\n');
+      document.getElementById('cvp-body-en').value = (b.en || []).join('\n');
+      renderMetricsList();
+    }
+
+    function renderMetricsList() {
+      const list = document.getElementById('cvp-metrics-list');
+      const arr = cvData.metrics || [];
+      list.innerHTML = arr.map((m, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${m.value}</div>
+            <div class="cv-item-sub">${m.fr}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvpEditMetric','cvpDeleteMetric','cvpMoveMetric',arr.length)}</div>
+        </div>`).join('');
+    }
+
+    function cvpEditMetric(idx) {
+      const m = cvData.metrics[idx];
+      document.getElementById('cvm-idx').value = idx;
+      document.getElementById('cvm-value').value = m.value;
+      document.getElementById('cvm-fr').value = m.fr;
+      document.getElementById('cvm-en').value = m.en;
+      document.getElementById('cvp-metric-form-title').textContent = 'Modifier le chiffre';
+      document.getElementById('cvp-metric-form').style.display = 'block';
+    }
+    function cvpDeleteMetric(idx) {
+      if (!confirm('Supprimer ce chiffre ?')) return;
+      cvData.metrics.splice(idx, 1);
+      saveCVData();
+      renderMetricsList();
+    }
+    function cvpMoveMetric(idx, dir) {
+      const arr = cvData.metrics;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderMetricsList();
+    }
+    document.getElementById('cvp-add-metric').addEventListener('click', () => {
+      document.getElementById('cvm-idx').value = -1;
+      document.getElementById('cvm-value').value = '';
+      document.getElementById('cvm-fr').value = '';
+      document.getElementById('cvm-en').value = '';
+      document.getElementById('cvp-metric-form-title').textContent = 'Nouveau chiffre';
+      document.getElementById('cvp-metric-form').style.display = 'block';
+    });
+    document.getElementById('cvp-metric-cancel').addEventListener('click', () => {
+      document.getElementById('cvp-metric-form').style.display = 'none';
+    });
+    document.getElementById('cvp-metric-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvm-idx').value);
+      const item = {
+        value: document.getElementById('cvm-value').value.trim(),
+        fr:    document.getElementById('cvm-fr').value.trim(),
+        en:    document.getElementById('cvm-en').value.trim()
+      };
+      if (!item.value) return;
+      if (idx === -1) cvData.metrics.push(item);
+      else cvData.metrics[idx] = item;
+      saveCVData();
+      renderMetricsList();
+      document.getElementById('cvp-metric-form').style.display = 'none';
+    });
+
+    document.getElementById('cv-profil-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      cvData.tagline = {
+        fr: document.getElementById('cvp-tagline-fr').value.trim(),
+        en: document.getElementById('cvp-tagline-en').value.trim()
+      };
+      cvData.profileLead = {
+        fr: document.getElementById('cvp-lead-fr').value.trim(),
+        en: document.getElementById('cvp-lead-en').value.trim()
+      };
+      cvData.profileBody = {
+        fr: document.getElementById('cvp-body-fr').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        en: document.getElementById('cvp-body-en').value.split('\n').map(s=>s.trim()).filter(Boolean)
+      };
+      saveCVData();
+      showCVToast('cv-toast-profil');
+    });
+
+    // ── EXPÉRIENCE ────────────────────────────────────────
+    function renderXPList() {
+      const list = document.getElementById('cvx-list');
+      const arr = cvData.experience || [];
+      list.innerHTML = arr.map((x, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${x.role_fr || '—'}</div>
+            <div class="cv-item-sub">${x.org || ''} · ${x.period_fr || ''}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvxEdit','cvxDelete','cvxMove',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cvxEdit(idx) {
+      const x = cvData.experience[idx];
+      document.getElementById('cvx-idx').value = idx;
+      document.getElementById('cvx-period-fr').value  = x.period_fr || '';
+      document.getElementById('cvx-period-en').value  = x.period_en || '';
+      document.getElementById('cvx-role-fr').value    = x.role_fr   || '';
+      document.getElementById('cvx-role-en').value    = x.role_en   || '';
+      document.getElementById('cvx-org').value        = x.org       || '';
+      document.getElementById('cvx-desc-fr').value    = x.desc_fr   || '';
+      document.getElementById('cvx-desc-en').value    = x.desc_en   || '';
+      document.getElementById('cvx-bullets-fr').value = (x.bullets_fr||[]).map(stripHTML).join('\n');
+      document.getElementById('cvx-bullets-en').value = (x.bullets_en||[]).map(stripHTML).join('\n');
+      document.getElementById('cvx-form-title').textContent = 'Modifier l\'expérience';
+      document.getElementById('cvx-form').style.display = 'block';
+      document.getElementById('cvx-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    function cvxDelete(idx) {
+      if (!confirm('Supprimer cette expérience ?')) return;
+      cvData.experience.splice(idx, 1);
+      saveCVData(); renderXPList();
+      showCVToast('cv-toast-experience');
+    }
+    function cvxMove(idx, dir) {
+      const arr = cvData.experience;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderXPList();
+    }
+    document.getElementById('cvx-add-btn').addEventListener('click', () => {
+      document.getElementById('cvx-idx').value = -1;
+      ['cvx-period-fr','cvx-period-en','cvx-role-fr','cvx-role-en','cvx-org','cvx-desc-fr','cvx-desc-en','cvx-bullets-fr','cvx-bullets-en'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cvx-form-title').textContent = 'Nouvelle expérience';
+      document.getElementById('cvx-form').style.display = 'block';
+      document.getElementById('cvx-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+    document.getElementById('cvx-cancel').addEventListener('click', () => { document.getElementById('cvx-form').style.display = 'none'; });
+    document.getElementById('cvx-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvx-idx').value);
+      const item = {
+        period_fr:  document.getElementById('cvx-period-fr').value.trim(),
+        period_en:  document.getElementById('cvx-period-en').value.trim(),
+        role_fr:    document.getElementById('cvx-role-fr').value.trim(),
+        role_en:    document.getElementById('cvx-role-en').value.trim(),
+        org:        document.getElementById('cvx-org').value.trim(),
+        desc_fr:    document.getElementById('cvx-desc-fr').value.trim(),
+        desc_en:    document.getElementById('cvx-desc-en').value.trim(),
+        bullets_fr: document.getElementById('cvx-bullets-fr').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        bullets_en: document.getElementById('cvx-bullets-en').value.split('\n').map(s=>s.trim()).filter(Boolean)
+      };
+      if (!item.role_fr) return;
+      if (idx === -1) cvData.experience.unshift(item);
+      else cvData.experience[idx] = item;
+      saveCVData(); renderXPList();
+      document.getElementById('cvx-form').style.display = 'none';
+      showCVToast('cv-toast-experience');
+    });
+
+    // ── RÉALISATIONS ──────────────────────────────────────
+    function renderAchList() {
+      const list = document.getElementById('cva-list');
+      const arr = cvData.achievements || [];
+      list.innerHTML = arr.map((a, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${a.num} <span style="font-weight:400;color:var(--muted);font-size:.8rem">${a.tag}</span></div>
+            <div class="cv-item-sub">${stripHTML(a.txt_fr||'').slice(0,80)}…</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvaEdit','cvaDelete','cvaMove',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cvaEdit(idx) {
+      const a = cvData.achievements[idx];
+      document.getElementById('cva-idx').value = idx;
+      document.getElementById('cva-num').value    = a.num    || '';
+      document.getElementById('cva-tag').value    = a.tag    || '';
+      document.getElementById('cva-txt-fr').value = a.txt_fr || '';
+      document.getElementById('cva-txt-en').value = a.txt_en || '';
+      document.getElementById('cva-form-title').textContent = 'Modifier la réalisation';
+      document.getElementById('cva-form').style.display = 'block';
+      document.getElementById('cva-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    function cvaDelete(idx) {
+      if (!confirm('Supprimer cette réalisation ?')) return;
+      cvData.achievements.splice(idx, 1);
+      saveCVData(); renderAchList();
+      showCVToast('cv-toast-realisations');
+    }
+    function cvaMove(idx, dir) {
+      const arr = cvData.achievements;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderAchList();
+    }
+    document.getElementById('cva-add-btn').addEventListener('click', () => {
+      document.getElementById('cva-idx').value = -1;
+      ['cva-num','cva-tag','cva-txt-fr','cva-txt-en'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cva-form-title').textContent = 'Nouvelle réalisation';
+      document.getElementById('cva-form').style.display = 'block';
+      document.getElementById('cva-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+    document.getElementById('cva-cancel').addEventListener('click', () => { document.getElementById('cva-form').style.display = 'none'; });
+    document.getElementById('cva-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cva-idx').value);
+      const item = {
+        num:    document.getElementById('cva-num').value.trim(),
+        tag:    document.getElementById('cva-tag').value.trim(),
+        txt_fr: document.getElementById('cva-txt-fr').value.trim(),
+        txt_en: document.getElementById('cva-txt-en').value.trim()
+      };
+      if (!item.num) return;
+      if (idx === -1) cvData.achievements.push(item);
+      else cvData.achievements[idx] = item;
+      saveCVData(); renderAchList();
+      document.getElementById('cva-form').style.display = 'none';
+      showCVToast('cv-toast-realisations');
+    });
+
+    // ── FORMATION — DIPLÔMES ──────────────────────────────
+    function renderDegList() {
+      const list = document.getElementById('cvd-list');
+      const arr = (cvData.education && cvData.education.degrees) || [];
+      list.innerHTML = arr.map((d, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${d.deg_fr || '—'}</div>
+            <div class="cv-item-sub">${d.school || ''} ${d.when_fr ? '· '+d.when_fr : ''}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvdEdit','cvdDelete','cvdMove',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cvdEdit(idx) {
+      const d = cvData.education.degrees[idx];
+      document.getElementById('cvd-idx').value = idx;
+      document.getElementById('cvd-deg-fr').value  = d.deg_fr  || '';
+      document.getElementById('cvd-deg-en').value  = d.deg_en  || '';
+      document.getElementById('cvd-school').value  = d.school  || '';
+      document.getElementById('cvd-when-fr').value = d.when_fr || '';
+      document.getElementById('cvd-when-en').value = d.when_en || '';
+      document.getElementById('cvd-form-title').textContent = 'Modifier le diplôme';
+      document.getElementById('cvd-form').style.display = 'block';
+    }
+    function cvdDelete(idx) {
+      if (!confirm('Supprimer ce diplôme ?')) return;
+      cvData.education.degrees.splice(idx, 1);
+      saveCVData(); renderDegList();
+      showCVToast('cv-toast-formation');
+    }
+    function cvdMove(idx, dir) {
+      const arr = cvData.education.degrees;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderDegList();
+    }
+    document.getElementById('cvd-add-btn').addEventListener('click', () => {
+      document.getElementById('cvd-idx').value = -1;
+      ['cvd-deg-fr','cvd-deg-en','cvd-school','cvd-when-fr','cvd-when-en'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cvd-form-title').textContent = 'Nouveau diplôme';
+      document.getElementById('cvd-form').style.display = 'block';
+    });
+    document.getElementById('cvd-cancel').addEventListener('click', () => { document.getElementById('cvd-form').style.display = 'none'; });
+    document.getElementById('cvd-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvd-idx').value);
+      const item = {
+        deg_fr:  document.getElementById('cvd-deg-fr').value.trim(),
+        deg_en:  document.getElementById('cvd-deg-en').value.trim(),
+        school:  document.getElementById('cvd-school').value.trim(),
+        when_fr: document.getElementById('cvd-when-fr').value.trim(),
+        when_en: document.getElementById('cvd-when-en').value.trim()
+      };
+      if (!item.deg_fr) return;
+      if (!cvData.education) cvData.education = {degrees:[], certs:[]};
+      if (idx === -1) cvData.education.degrees.push(item);
+      else cvData.education.degrees[idx] = item;
+      saveCVData(); renderDegList();
+      document.getElementById('cvd-form').style.display = 'none';
+      showCVToast('cv-toast-formation');
+    });
+
+    // ── FORMATION — CERTIFICATIONS ────────────────────────
+    function renderCertList() {
+      const list = document.getElementById('cvc2-list');
+      const arr = (cvData.education && cvData.education.certs) || [];
+      list.innerHTML = arr.map((c, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${c.deg_fr || '—'}</div>
+            <div class="cv-item-sub">${c.school || ''}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvc2Edit','cvc2Delete','cvc2Move',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cvc2Edit(idx) {
+      const c = cvData.education.certs[idx];
+      document.getElementById('cvc2-idx').value = idx;
+      document.getElementById('cvc2-deg-fr').value = c.deg_fr || '';
+      document.getElementById('cvc2-deg-en').value = c.deg_en || '';
+      document.getElementById('cvc2-school').value = c.school || '';
+      document.getElementById('cvc2-form-title').textContent = 'Modifier la certification';
+      document.getElementById('cvc2-form').style.display = 'block';
+    }
+    function cvc2Delete(idx) {
+      if (!confirm('Supprimer cette certification ?')) return;
+      cvData.education.certs.splice(idx, 1);
+      saveCVData(); renderCertList();
+      showCVToast('cv-toast-formation');
+    }
+    function cvc2Move(idx, dir) {
+      const arr = cvData.education.certs;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderCertList();
+    }
+    document.getElementById('cvc2-add-btn').addEventListener('click', () => {
+      document.getElementById('cvc2-idx').value = -1;
+      ['cvc2-deg-fr','cvc2-deg-en','cvc2-school'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cvc2-form-title').textContent = 'Nouvelle certification';
+      document.getElementById('cvc2-form').style.display = 'block';
+    });
+    document.getElementById('cvc2-cancel').addEventListener('click', () => { document.getElementById('cvc2-form').style.display = 'none'; });
+    document.getElementById('cvc2-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvc2-idx').value);
+      const item = {
+        deg_fr: document.getElementById('cvc2-deg-fr').value.trim(),
+        deg_en: document.getElementById('cvc2-deg-en').value.trim(),
+        school: document.getElementById('cvc2-school').value.trim()
+      };
+      if (!item.deg_fr) return;
+      if (!cvData.education) cvData.education = {degrees:[], certs:[]};
+      if (idx === -1) cvData.education.certs.push(item);
+      else cvData.education.certs[idx] = item;
+      saveCVData(); renderCertList();
+      document.getElementById('cvc2-form').style.display = 'none';
+      showCVToast('cv-toast-formation');
+    });
+
+    // ── COMPÉTENCES ───────────────────────────────────────
+    function loadCompForm() {
+      document.getElementById('cvco-skills-fr').value = (cvData.skills&&cvData.skills.fr||[]).join('\n');
+      document.getElementById('cvco-skills-en').value = (cvData.skills&&cvData.skills.en||[]).join('\n');
+      document.getElementById('cvco-qual-fr').value   = (cvData.qualities&&cvData.qualities.fr||[]).join('\n');
+      document.getElementById('cvco-qual-en').value   = (cvData.qualities&&cvData.qualities.en||[]).join('\n');
+      renderLangList();
+    }
+    function renderLangList() {
+      const list = document.getElementById('cvco-lang-list');
+      const arr = cvData.languages || [];
+      list.innerHTML = arr.map((l, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${l.fr || '—'}</div>
+            <div class="cv-item-sub">${l.en || ''}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cvcoLangEdit','cvcoLangDelete','cvcoLangMove',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cvcoLangEdit(idx) {
+      const l = cvData.languages[idx];
+      document.getElementById('cvco-lang-idx').value = idx;
+      document.getElementById('cvco-lang-fr').value = l.fr || '';
+      document.getElementById('cvco-lang-en').value = l.en || '';
+      document.getElementById('cvco-lang-form-title').textContent = 'Modifier la langue';
+      document.getElementById('cvco-lang-form').style.display = 'block';
+    }
+    function cvcoLangDelete(idx) {
+      if (!confirm('Supprimer cette langue ?')) return;
+      cvData.languages.splice(idx, 1);
+      saveCVData(); renderLangList();
+      showCVToast('cv-toast-competences');
+    }
+    function cvcoLangMove(idx, dir) {
+      const arr = cvData.languages;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderLangList();
+    }
+    document.getElementById('cvco-lang-add').addEventListener('click', () => {
+      document.getElementById('cvco-lang-idx').value = -1;
+      document.getElementById('cvco-lang-fr').value = '';
+      document.getElementById('cvco-lang-en').value = '';
+      document.getElementById('cvco-lang-form-title').textContent = 'Nouvelle langue';
+      document.getElementById('cvco-lang-form').style.display = 'block';
+    });
+    document.getElementById('cvco-lang-cancel').addEventListener('click', () => {
+      document.getElementById('cvco-lang-form').style.display = 'none';
+    });
+    document.getElementById('cvco-lang-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvco-lang-idx').value);
+      const item = {
+        fr: document.getElementById('cvco-lang-fr').value.trim(),
+        en: document.getElementById('cvco-lang-en').value.trim()
+      };
+      if (!item.fr) return;
+      if (idx === -1) cvData.languages.push(item);
+      else cvData.languages[idx] = item;
+      saveCVData(); renderLangList();
+      document.getElementById('cvco-lang-form').style.display = 'none';
+      showCVToast('cv-toast-competences');
+    });
+    document.getElementById('cv-comp-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      cvData.skills = {
+        fr: document.getElementById('cvco-skills-fr').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        en: document.getElementById('cvco-skills-en').value.split('\n').map(s=>s.trim()).filter(Boolean)
+      };
+      cvData.qualities = {
+        fr: document.getElementById('cvco-qual-fr').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        en: document.getElementById('cvco-qual-en').value.split('\n').map(s=>s.trim()).filter(Boolean)
+      };
+      saveCVData();
+      showCVToast('cv-toast-competences');
+    });
+
+    // ── IMPLICATIONS ──────────────────────────────────────
+    function renderImplList() {
+      const list = document.getElementById('cvi-list');
+      const arr = cvData.implications || [];
+      list.innerHTML = arr.map((x, i) => `
+        <div class="cv-item">
+          <div class="cv-item-body">
+            <div class="cv-item-title">${x.title_fr || '—'}</div>
+            <div class="cv-item-sub">${x.meta_fr || ''}</div>
+          </div>
+          <div class="cv-item-acts">${makeListActions(i,'cviEdit','cviDelete','cviMove',arr.length)}</div>
+        </div>`).join('');
+    }
+    function cviEdit(idx) {
+      const x = cvData.implications[idx];
+      document.getElementById('cvi-idx').value = idx;
+      document.getElementById('cvi-title-fr').value = x.title_fr || '';
+      document.getElementById('cvi-title-en').value = x.title_en || '';
+      document.getElementById('cvi-meta-fr').value  = x.meta_fr  || '';
+      document.getElementById('cvi-meta-en').value  = x.meta_en  || '';
+      document.getElementById('cvi-form-title').textContent = "Modifier l'implication";
+      document.getElementById('cvi-form').style.display = 'block';
+      document.getElementById('cvi-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    function cviDelete(idx) {
+      if (!confirm('Supprimer cette implication ?')) return;
+      cvData.implications.splice(idx, 1);
+      saveCVData(); renderImplList();
+      showCVToast('cv-toast-implications');
+    }
+    function cviMove(idx, dir) {
+      const arr = cvData.implications;
+      const ni = idx + dir;
+      if (ni < 0 || ni >= arr.length) return;
+      [arr[idx], arr[ni]] = [arr[ni], arr[idx]];
+      renderImplList();
+    }
+    document.getElementById('cvi-add-btn').addEventListener('click', () => {
+      document.getElementById('cvi-idx').value = -1;
+      ['cvi-title-fr','cvi-title-en','cvi-meta-fr','cvi-meta-en'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cvi-form-title').textContent = 'Nouvelle implication';
+      document.getElementById('cvi-form').style.display = 'block';
+      document.getElementById('cvi-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+    });
+    document.getElementById('cvi-cancel').addEventListener('click', () => {
+      document.getElementById('cvi-form').style.display = 'none';
+    });
+    document.getElementById('cvi-save').addEventListener('click', () => {
+      const idx = parseInt(document.getElementById('cvi-idx').value);
+      const item = {
+        title_fr: document.getElementById('cvi-title-fr').value.trim(),
+        title_en: document.getElementById('cvi-title-en').value.trim(),
+        meta_fr:  document.getElementById('cvi-meta-fr').value.trim(),
+        meta_en:  document.getElementById('cvi-meta-en').value.trim()
+      };
+      if (!item.title_fr) return;
+      if (idx === -1) cvData.implications.push(item);
+      else cvData.implications[idx] = item;
+      saveCVData(); renderImplList();
+      document.getElementById('cvi-form').style.display = 'none';
+      showCVToast('cv-toast-implications');
+    });
+
+    // ── Load everything ───────────────────────────────────
+    function loadCVAllForms() {
+      loadContactForm();
+      loadProfilForm();
+      renderXPList();
+      renderAchList();
+      renderDegList();
+      renderCertList();
+      loadCompForm();
+      renderImplList();
+    }
+    loadCVData();
+    loadCVAllForms();
+
+    // ======================================================
+    // ====== PHOTOS EDITOR =================================
+    // ======================================================
+
+    const PHOTO_DB_NAME  = 'pa-photos-db';
+    const PHOTO_DB_STORE = 'photos';
+    const PHOTO_DB_VER   = 1;
+
+    function photoOpenDB() {
+      return new Promise((res, rej) => {
+        const r = indexedDB.open(PHOTO_DB_NAME, PHOTO_DB_VER);
+        r.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(PHOTO_DB_STORE))
+            db.createObjectStore(PHOTO_DB_STORE, { keyPath: 'id' });
+        };
+        r.onsuccess = e => res(e.target.result);
+        r.onerror   = e => rej(e.target.error);
+      });
+    }
+    function photoGetAll() {
+      return photoOpenDB().then(db => new Promise((res, rej) => {
+        const req = db.transaction(PHOTO_DB_STORE, 'readonly').objectStore(PHOTO_DB_STORE).getAll();
+        req.onsuccess = e => res(e.target.result.sort((a, b) => (a.order ?? 0) - (b.order ?? 0)));
+        req.onerror   = e => rej(e.target.error);
+      }));
+    }
+    function photoPut(photo) {
+      return photoOpenDB().then(db => new Promise((res, rej) => {
+        const req = db.transaction(PHOTO_DB_STORE, 'readwrite').objectStore(PHOTO_DB_STORE).put(photo);
+        req.onsuccess = () => res();
+        req.onerror   = e => rej(e.target.error);
+      }));
+    }
+    function photoDelete(id) {
+      return photoOpenDB().then(db => new Promise((res, rej) => {
+        const req = db.transaction(PHOTO_DB_STORE, 'readwrite').objectStore(PHOTO_DB_STORE).delete(id);
+        req.onsuccess = () => res();
+        req.onerror   = e => rej(e.target.error);
+      }));
+    }
+
+    let adminPhotos = [];
+
+    function renderPhotoGrid() {
+      const grid  = document.getElementById('photoAdminGrid');
+      const empty = document.getElementById('photoAdminEmpty');
+      if (!adminPhotos.length) {
+        grid.innerHTML = '';
+        grid.appendChild(empty);
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      grid.innerHTML = adminPhotos.map((p, i) => `
+        <div class="photo-admin-item" data-id="${p.id}">
+          <img class="photo-admin-thumb" src="${p.dataURL}" alt="" />
+          <div class="photo-admin-body">
+            <label style="font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:4px;display:block;">💬 Commentaire</label>
+            <input type="text" class="photo-cap-fr" value="${escAttr(p.caption_fr || '')}" placeholder="Identifiez cette photo…" style="margin-bottom:6px;" />
+            <input type="text" class="photo-cap-en" value="${escAttr(p.caption_en || '')}" placeholder="English description (optional)…" style="font-size:.8rem;opacity:.75;" />
+            <div class="photo-admin-acts">
+              <div class="photo-order-btns">
+                ${i > 0 ? `<button class="photo-ord" onclick="photoMove('${p.id}',-1)" title="Monter">▲</button>` : '<span style="width:26px"></span>'}
+                ${i < adminPhotos.length-1 ? `<button class="photo-ord" onclick="photoMove('${p.id}',1)" title="Descendre">▼</button>` : '<span style="width:26px"></span>'}
+              </div>
+              <button class="photo-admin-save" onclick="photoSaveCaption('${p.id}')">&#10003; OK</button>
+              <button class="photo-admin-del"  onclick="photoRemove('${p.id}')">&#128465;</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function escAttr(s) { return s.replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+    function photoShowToast() {
+      const t = document.getElementById('photoToast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function photoSaveCaption(id) {
+      const item = document.querySelector('.photo-admin-item[data-id="' + id + '"]');
+      if (!item) return;
+      const p = adminPhotos.find(x => x.id === id);
+      if (!p) return;
+      p.caption_fr = item.querySelector('.photo-cap-fr').value.trim();
+      p.caption_en = item.querySelector('.photo-cap-en').value.trim();
+      photoPut(p).then(() => photoShowToast());
+    }
+
+    function photoRemove(id) {
+      if (!confirm('Supprimer cette photo ?')) return;
+      photoDelete(id).then(() => {
+        adminPhotos = adminPhotos.filter(p => p.id !== id);
+        renderPhotoGrid();
+        photoShowToast();
+      });
+    }
+
+    function photoMove(id, dir) {
+      const idx = adminPhotos.findIndex(p => p.id === id);
+      const ni  = idx + dir;
+      if (ni < 0 || ni >= adminPhotos.length) return;
+      [adminPhotos[idx], adminPhotos[ni]] = [adminPhotos[ni], adminPhotos[idx]];
+      adminPhotos.forEach((p, i) => { p.order = i; });
+      Promise.all(adminPhotos.map(photoPut)).then(() => renderPhotoGrid());
+    }
+
+    function photoReadFile(file, order) {
+      return new Promise((res) => {
+        const reader = new FileReader();
+        reader.onload = e => res({
+          id:         'ph_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+          dataURL:    e.target.result,
+          caption_fr: '',
+          caption_en: '',
+          date_added: new Date().toISOString(),
+          order:      order
+        });
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function photoHandleFiles(files) {
+      const arr   = Array.from(files).filter(f => f.type.startsWith('image/'));
+      if (!arr.length) return;
+      const prog    = document.getElementById('photoProgress');
+      const progBar = document.getElementById('photoProgressBar');
+      prog.style.display = 'block';
+      const base  = adminPhotos.length;
+      for (let i = 0; i < arr.length; i++) {
+        progBar.style.width = Math.round(((i + 1) / arr.length) * 100) + '%';
+        const photo = await photoReadFile(arr[i], base + i);
+        await photoPut(photo);
+        adminPhotos.push(photo);
+      }
+      prog.style.display = 'none';
+      progBar.style.width = '0%';
+      renderPhotoGrid();
+      photoShowToast();
+    }
+
+    const dropZone = document.getElementById('photoDropZone');
+    dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      photoHandleFiles(e.dataTransfer.files);
+    });
+    document.getElementById('photoFileInput').addEventListener('change', function() {
+      photoHandleFiles(this.files);
+      this.value = '';
+    });
+
+
+
+
+    // Génération canvas pour les photos démo
+    function photoMakeDemo(c1, c2, emoji, label) {
+      const cv = document.createElement('canvas');
+      cv.width = 600; cv.height = 400;
+      const ctx = cv.getContext('2d');
+      const g = ctx.createLinearGradient(0, 0, 600, 400);
+      g.addColorStop(0, c1); g.addColorStop(1, c2);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 600, 400);
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath(); ctx.arc(480, 80, 120, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.beginPath(); ctx.arc(100, 340, 90, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.30)'; ctx.fillRect(0, 300, 600, 100);
+      ctx.font = '52px serif'; ctx.textAlign = 'center'; ctx.fillText(emoji, 300, 180);
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = 'bold 22px system-ui,sans-serif'; ctx.fillText(label, 300, 360);
+      return cv.toDataURL('image/jpeg', 0.82);
+    }
+
+    const PHOTO_DEMOS = [
+      { caption_fr:'Montagne au lever du soleil', caption_en:'Mountain at sunrise',    c1:'#f97316', c2:'#fbbf24', e:'⛰️' },
+      { caption_fr:'Forêt boréale',               caption_en:'Boreal forest',          c1:'#15803d', c2:'#4ade80', e:'🌲' },
+      { caption_fr:'Mer au coucher du soleil',    caption_en:'Sea at sunset',          c1:'#0369a1', c2:'#7c3aed', e:'🌅' },
+      { caption_fr:'Ville la nuit',               caption_en:'City at night',          c1:'#1e1b4b', c2:'#a855f7', e:'🌃' },
+      { caption_fr:'Champ de lavande',            caption_en:'Lavender field',         c1:'#7e22ce', c2:'#f472b6', e:'💜' },
+      { caption_fr:'Lac de montagne',             caption_en:'Mountain lake',          c1:'#0891b2', c2:'#34d399', e:'🏔️' },
+      { caption_fr:'Désert au crépuscule',        caption_en:'Desert at dusk',         c1:'#b45309', c2:'#f87171', e:'🌄' },
+      { caption_fr:'Aurores boréales',            caption_en:'Northern lights',        c1:'#064e3b', c2:'#6ee7b7', e:'✨' },
+    ];
+
+    photoGetAll().then(async p => {
+      if (p.length) {
+        adminPhotos = p;
+      } else {
+        // Aucune photo → générer et sauvegarder les démos dans IndexedDB
+        for (let i = 0; i < PHOTO_DEMOS.length; i++) {
+          const d = PHOTO_DEMOS[i];
+          const photo = {
+            id: 'ph_demo_' + i,
+            dataURL: photoMakeDemo(d.c1, d.c2, d.e, d.caption_fr),
+            caption_fr: d.caption_fr,
+            caption_en: d.caption_en,
+            date_added: new Date().toISOString(),
+            order: i
+          };
+          await photoPut(photo);
+          adminPhotos.push(photo);
+        }
+      }
+      renderPhotoGrid();
+    });
+
+    // ====================================================
+    // ====== RÉFÉRENCES / TÉMOIGNAGES ==================
+    // ====================================================
+    const REF_KEY = 'pa-references';
+    let refs = [];
+    let refEditId = null;
+
+    const ADMIN_DEMO_REFS = [
+      { id: 'ref_demo_1', quote: "Pierre-Alexandre est un gestionnaire d'exception. Sa capacité à mobiliser les équipes dans des contextes de changement est remarquable.", name: "Sophie Tremblay", title: "VP Ressources humaines, Bell Média", active: true },
+      { id: 'ref_demo_2', quote: "J'ai eu le privilège de travailler avec Pierre-Alexandre sur plusieurs dossiers stratégiques. Son leadership calme et sa rigueur analytique font toute la différence.", name: "Martin Fortin", title: "Directeur général, Québecor", active: true },
+      { id: 'ref_demo_3', quote: "Une présence rassurante, une vision claire. Pierre-Alexandre sait transformer les défis organisationnels en opportunités de croissance.", name: "Julie Bélanger", title: "Conseillère principale, Cabinet du premier ministre", active: true },
+    ];
+
+    function refSaveData() {
+      try { localStorage.setItem(REF_KEY, JSON.stringify(refs)); } catch(e) {}
+    }
+    function refLoadData() {
+      try { refs = JSON.parse(localStorage.getItem(REF_KEY) || '[]'); } catch(e) { refs = []; }
+      if (!refs.length) { refs = JSON.parse(JSON.stringify(ADMIN_DEMO_REFS)); refSaveData(); }
+    }
+    function refGenId() { return 'ref_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+    function refRenderList() {
+      const list = document.getElementById('refList');
+      if (!list) return;
+      if (!refs.length) {
+        list.innerHTML = '<div class="ref-empty">Aucune référence pour le moment.</div>';
+        return;
+      }
+      list.innerHTML = refs.map((r,i) => `
+        <div class="ref-item${r.active ? '' : ' inactive'}">
+          <div class="ref-quote-text">« ${r.quote} »</div>
+          <div class="ref-meta">${r.name}${r.title ? ' — ' + r.title : ''}</div>
+          <div class="ref-acts">
+            <button class="ref-btn toggle-${r.active?'on':'off'}" onclick="refToggle(${i})">${r.active ? '✓ Actif' : '○ Inactif'}</button>
+            <button class="ref-btn" onclick="refEdit(${i})">✏ Modifier</button>
+            <button class="ref-btn del" onclick="refRemove(${i})">🗑 Supprimer</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function refToggle(i) {
+      refs[i].active = !refs[i].active;
+      refSaveData(); refRenderList();
+    }
+    function refRemove(i) {
+      if (!confirm('Supprimer cette référence ?')) return;
+      refs.splice(i, 1);
+      refSaveData(); refRenderList();
+    }
+    function refEdit(i) {
+      refEditId = i;
+      document.getElementById('refQuoteInput').value = refs[i].quote;
+      document.getElementById('refNameInput').value  = refs[i].name;
+      document.getElementById('refTitleInput').value = refs[i].title || '';
+      document.getElementById('refForm').style.display = 'block';
+    }
+    function refShowForm() {
+      refEditId = null;
+      document.getElementById('refQuoteInput').value = '';
+      document.getElementById('refNameInput').value  = '';
+      document.getElementById('refTitleInput').value = '';
+      document.getElementById('refForm').style.display = 'block';
+    }
+    function refClearForm() {
+      refEditId = null;
+      document.getElementById('refForm').style.display = 'none';
+    }
+    function refSave() {
+      const quote = document.getElementById('refQuoteInput').value.trim();
+      const name  = document.getElementById('refNameInput').value.trim();
+      const title = document.getElementById('refTitleInput').value.trim();
+      if (!quote || !name) { alert('La citation et le nom sont obligatoires.'); return; }
+      if (refEditId !== null) {
+        refs[refEditId] = { ...refs[refEditId], quote, name, title };
+      } else {
+        refs.push({ id: refGenId(), quote, name, title, active: true });
+      }
+      refSaveData(); refRenderList(); refClearForm();
+    }
+
+    refLoadData(); refRenderList();
+    // ====== END RÉFÉRENCES =============================
+    // ====================================================
+    // ====== SÉCURITÉ — CHANGEMENT DE MOT DE PASSE ======
+    // ====================================================
+    const HASH_KEY    = 'pa-admin-hash';
+    const DEFAULT_PWD = 'PAN2026';
+
+    function genSalt() {
+      return [...crypto.getRandomValues(new Uint8Array(16))]
+        .map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    async function pbkdf2Hash(password, salt) {
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits(
+        { name:'PBKDF2', salt: enc.encode(salt), iterations: 100000, hash:'SHA-256' }, key, 256
+      );
+      return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    async function pwdVerify(input) {
+      const stored = JSON.parse(localStorage.getItem(HASH_KEY) || 'null');
+      if (stored) {
+        return (await pbkdf2Hash(input, stored.salt)) === stored.hash;
+      }
+      return input === DEFAULT_PWD;
+    }
+
+    function pwdToggleVis(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.innerHTML = show
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+
+    function pwdCheckStrength() {
+      const v = document.getElementById('pwdNew').value;
+      const rules = { rLen: v.length >= 8, rUpper: /[A-Z]/.test(v), rNum: /[0-9]/.test(v), rSpecial: /[^A-Za-z0-9]/.test(v) };
+      Object.entries(rules).forEach(([id, ok]) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('ok', ok);
+      });
+      const score = Object.values(rules).filter(Boolean).length;
+      const bar   = document.getElementById('pwdStrBar');
+      const label = document.getElementById('pwdStrLabel');
+      const colors = ['#ef4444','#f97316','#eab308','#16a34a'];
+      const labels = ['Très faible','Faible','Moyen','Fort'];
+      bar.style.width   = (score * 25) + '%';
+      bar.style.background = colors[score - 1] || 'var(--border)';
+      label.textContent = score > 0 ? labels[score - 1] : '';
+      label.style.color = colors[score - 1] || 'var(--muted)';
+      pwdCheckMatch();
+    }
+
+    function pwdCheckMatch() {
+      const a = document.getElementById('pwdNew').value;
+      const b = document.getElementById('pwdConfirm').value;
+      const msg = document.getElementById('pwdMatchMsg');
+      if (!b) { msg.textContent = ''; return; }
+      if (a === b) { msg.textContent = '✓ Les mots de passe correspondent'; msg.style.color = '#16a34a'; }
+      else         { msg.textContent = '✗ Les mots de passe ne correspondent pas'; msg.style.color = '#ef4444'; }
+    }
+
+    async function pwdSave() {
+      const current = document.getElementById('pwdCurrent').value;
+      const newPwd  = document.getElementById('pwdNew').value;
+      const confirm = document.getElementById('pwdConfirm').value;
+      const msgEl   = document.getElementById('pwdMsg');
+      const btn     = document.getElementById('pwdSaveBtn');
+
+      function showMsg(text, ok) {
+        msgEl.style.display = 'block';
+        msgEl.style.color   = ok ? '#16a34a' : '#ef4444';
+        msgEl.textContent   = text;
+      }
+
+      if (!current || !newPwd || !confirm) { showMsg('Tous les champs sont requis.', false); return; }
+      if (newPwd !== confirm) { showMsg('Les nouveaux mots de passe ne correspondent pas.', false); return; }
+      if (newPwd.length < 8)  { showMsg('Le nouveau mot de passe doit avoir au moins 8 caractères.', false); return; }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Vérification…';
+
+      try {
+        const ok = await pwdVerify(current);
+        if (!ok) {
+          showMsg('Mot de passe actuel incorrect.', false);
+          btn.disabled = false; btn.textContent = 'Changer le mot de passe';
+          document.getElementById('pwdCurrent').value = '';
+          return;
+        }
+        const salt = genSalt();
+        const hash = await pbkdf2Hash(newPwd, salt);
+        localStorage.setItem(HASH_KEY, JSON.stringify({ hash, salt }));
+        document.getElementById('pwdCurrent').value = '';
+        document.getElementById('pwdNew').value = '';
+        document.getElementById('pwdConfirm').value = '';
+        document.getElementById('pwdStrBar').style.width = '0%';
+        document.getElementById('pwdStrLabel').textContent = '';
+        document.getElementById('pwdMatchMsg').textContent = '';
+        document.querySelectorAll('#pwdRules li').forEach(li => li.classList.remove('ok'));
+        showMsg('✓ Mot de passe changé avec succès. Utilisez-le à votre prochaine connexion.', true);
+      } catch(e) {
+        showMsg('Erreur technique : ' + e.message, false);
+      }
+      btn.disabled = false; btn.textContent = 'Changer le mot de passe';
+    }
+
+    // ====================================================
+    // ====== À PROPOS EDITOR ============================
+    // ====================================================
+    const AP_DEFAULTS = {
+      subtitle_fr: "Gestionnaire et leader d'équipe — 20+ années en communications, gouvernance et organisation événementielle.",
+      subtitle_en: "Manager and team leader — 20+ years in communications, governance, and event organization.",
+      bio_fr: "Professionnel accompli avec plus de 15 ans d'expérience en gestion d'équipes et en transformation organisationnelle.\n\nPassionné par l'innovation et le leadership collaboratif, je m'engage à créer de la valeur durable pour les organisations et les personnes qui les composent.",
+      bio_en: "Accomplished professional with over 15 years of experience in team management and organizational transformation.\n\nPassionate about innovation and collaborative leadership, I am committed to creating lasting value for organizations and the people within them.",
+      tags: ["Stratégie", "Leadership", "Innovation", "Transformation"],
+      photo: null
+    };
+
+    function apLoad() {
+      let d;
+      try { d = JSON.parse(localStorage.getItem("pa-apropos") || "null") || AP_DEFAULTS; }
+      catch(e) { d = AP_DEFAULTS; }
+
+      document.getElementById("apSubtitleFr").value = d.subtitle_fr || "";
+      document.getElementById("apSubtitleEn").value = d.subtitle_en || "";
+      document.getElementById("apBioFr").value = d.bio_fr || "";
+      document.getElementById("apBioEn").value = d.bio_en || "";
+      document.getElementById("apTags").value = (d.tags || []).join(", ");
+
+      const preview = document.getElementById("apPhotoPreview");
+      if (d.photo) {
+        preview.innerHTML = '<img src="' + d.photo + '" style="width:100%;height:100%;object-fit:cover;" />';
+      }
+    }
+
+    function apPhotoSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById("apPhotoPreview");
+        preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;" />';
+        preview.dataset.photoData = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function apPhotoRemove() {
+      const preview = document.getElementById("apPhotoPreview");
+      preview.dataset.photoData = "";
+      preview.innerHTML = '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+    }
+
+    function apSave() {
+      let existing;
+      try { existing = JSON.parse(localStorage.getItem("pa-apropos") || "null") || {}; }
+      catch(e) { existing = {}; }
+
+      const preview = document.getElementById("apPhotoPreview");
+      const newPhoto = preview.dataset.photoData !== undefined
+        ? (preview.dataset.photoData || null)
+        : (existing.photo || null);
+
+      const tags = document.getElementById("apTags").value
+        .split(",").map(t => t.trim()).filter(Boolean);
+
+      const data = {
+        photo: newPhoto,
+        subtitle_fr: document.getElementById("apSubtitleFr").value.trim(),
+        subtitle_en: document.getElementById("apSubtitleEn").value.trim(),
+        bio_fr: document.getElementById("apBioFr").value,
+        bio_en: document.getElementById("apBioEn").value,
+        tags
+      };
+
+      localStorage.setItem("pa-apropos", JSON.stringify(data));
+
+      const msg = document.getElementById("apSavedMsg");
+      msg.style.display = "inline";
+      setTimeout(() => msg.style.display = "none", 2500);
+    }
+
+    apLoad();
+    // ====== END À PROPOS ===================================
+
+
+    // ====================================================
+    // ====== SAUVEGARDE / RESTAURATION ==================
+    // ====================================================
+    const BACKUP_KEYS = ['pa-blog-posts','pa-cv-data','pa-theme','pa-lang','pa-references','pa-apropos'];
+
+    function backupShowMsg(text, ok) {
+      const el = document.getElementById('backupMsg');
+      el.style.display = 'block';
+      el.style.background = ok ? 'rgba(22,163,74,.12)' : 'rgba(220,38,38,.10)';
+      el.style.color = ok ? '#15803d' : '#b91c1c';
+      el.style.border = '1px solid ' + (ok ? 'rgba(22,163,74,.3)' : 'rgba(220,38,38,.25)');
+      el.textContent = text;
+      setTimeout(() => el.style.display = 'none', 5000);
+    }
+
+    async function backupExport() {
+      try {
+        const data = { version: 1, date: new Date().toISOString(), localStorage: {} };
+
+        // localStorage
+        BACKUP_KEYS.forEach(k => {
+          const v = localStorage.getItem(k);
+          if (v) data.localStorage[k] = v;
+        });
+
+        // IndexedDB photos
+        const photos = await photoGetAll();
+        data.photos = photos;
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const date = new Date().toISOString().slice(0,10);
+        a.href = url; a.download = 'sauvegarde-panormand-' + date + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        backupShowMsg('✓ Sauvegarde téléchargée avec succès.', true);
+      } catch(e) {
+        backupShowMsg('Erreur lors de l\'export : ' + e.message, false);
+      }
+    }
+
+    async function backupImport(input) {
+      const file = input.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (!data.version || !data.localStorage) {
+          backupShowMsg('Fichier invalide — ce n\'est pas une sauvegarde reconnue.', false);
+          return;
+        }
+
+        if (!confirm('Cette opération va remplacer toutes vos données actuelles. Continuer ?')) {
+          input.value = ''; return;
+        }
+
+        // Restaurer localStorage
+        Object.entries(data.localStorage).forEach(([k, v]) => {
+          try { localStorage.setItem(k, v); } catch(e) {}
+        });
+
+        // Restaurer photos IndexedDB
+        if (data.photos && data.photos.length) {
+          for (const photo of data.photos) {
+            await photoPut(photo);
+          }
+        }
+
+        input.value = '';
+        backupShowMsg('✓ Restauration réussie ! La page va se recharger…', true);
+        setTimeout(() => location.reload(), 2000);
+      } catch(e) {
+        backupShowMsg('Erreur lors de l\'import : ' + e.message, false);
+      }
+    }
+    // ====== END SAUVEGARDE ===================================
+
+    // ====== END SÉCURITÉ ===================================
+
+
+
+  </script>
+</body>
+</html>

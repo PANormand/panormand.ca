@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>À propos — Pierre-Alexandre Normand</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Variables (thèmes) ─────────────────────────────── */
+    :root {
+      --font-heading: Georgia, "Times New Roman", serif;
+      --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --radius: 10px;
+      --color-bg:        #f5f1e8;
+      --color-surface:   #fffdf8;
+      --color-text:      #1a1a1a;
+      --color-muted:     #6b655b;
+      --color-subtle:    #918a7d;
+      --color-border:    #e4ddcc;
+      --color-accent:    #7a3b2e;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #ece4d1;
+      --shadow: 0 8px 32px -8px rgba(50,30,10,.12);
+    }
+    [data-theme="executive"] {
+      --color-bg:        #f0f4f8;
+      --color-surface:   #ffffff;
+      --color-text:      #0f1f35;
+      --color-muted:     #4a607a;
+      --color-subtle:    #8096b0;
+      --color-border:    #d0dcea;
+      --color-accent:    #1e5fa0;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #dae8f5;
+    }
+    [data-theme="signature"] {
+      --color-bg:        #faf6ee;
+      --color-surface:   #fffef9;
+      --color-text:      #1a160a;
+      --color-muted:     #6a5c3a;
+      --color-subtle:    #9a8c6a;
+      --color-border:    #e8dfc6;
+      --color-accent:    #8a6428;
+      --color-accent-ink:#ffffff;
+      --color-soft:      #f0e4c8;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background .35s, color .35s;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    .wrap-wide { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+    @media (max-width: 600px) { .wrap-wide { padding: 0 20px; } }
+
+    /* ── Topbar ─────────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: saturate(160%) blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .topbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 12px 0;
+    }
+    .home-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-border);
+      font-size: .82rem; font-weight: 600;
+      color: var(--color-text); background: var(--color-surface);
+      transition: border-color .18s, color .18s, transform .15s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .home-btn:hover { border-color: var(--color-accent); color: var(--color-accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .nav a {
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid var(--color-border);
+      font-size: .82rem; font-weight: 600; letter-spacing: .02em;
+      color: var(--color-text); text-decoration: none;
+      background: var(--color-surface);
+      transition: background .18s, border-color .18s, color .18s, transform .15s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .nav a:hover { border-color: var(--color-accent); color: var(--color-accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .nav a.active { border-color: var(--color-accent); color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 8%, transparent); }
+    .btn-contact-nav {
+      border-color: var(--color-accent) !important;
+      color: var(--color-accent) !important;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent) !important;
+      font-weight: 700 !important;
+    }
+    .btn-contact-nav:hover { background: color-mix(in srgb, var(--color-accent) 18%, transparent) !important; }
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .pill { display: inline-flex; gap: 2px; padding: 3px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 999px; }
+    .pill button { border: 0; background: transparent; cursor: pointer; font: inherit; font-size: .78rem; color: var(--color-muted); padding: 5px 11px; border-radius: 999px; transition: background .2s, color .2s; }
+    .pill button.is-active { background: var(--color-accent); color: var(--color-accent-ink); }
+    .conn-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-border); font-size: .78rem; font-weight: 600; color: var(--color-muted); background: var(--color-surface); transition: border-color .18s, color .18s, transform .15s; }
+    .conn-link:hover { border-color: var(--color-accent); color: var(--color-accent); transform: translateY(-1px); }
+    @media (max-width: 720px) { .nav { display: none; } }
+
+    /* ── Hero ───────────────────────────────────────────── */
+    .ap-hero {
+      padding: 64px 0 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: start;
+    }
+    @media (max-width: 640px) { .ap-hero { grid-template-columns: 1fr; } .ap-photo { order: -1; } }
+    .ap-eyebrow { font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent); font-weight: 700; margin-bottom: 14px; }
+    .ap-name { font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 700; line-height: 1.05; letter-spacing: -.02em; margin-bottom: 18px; }
+    .ap-name .soft { color: var(--color-muted); font-weight: 400; font-style: italic; }
+    .ap-rule { width: 48px; border: 0; border-top: 2px solid var(--color-accent); margin: 20px 0; }
+    .ap-subtitle { font-family: var(--font-heading); font-size: clamp(1rem, 1.6vw, 1.25rem); font-style: italic; color: var(--color-muted); line-height: 1.45; max-width: 520px; }
+    .ap-photo { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-soft); box-shadow: var(--shadow); flex-shrink: 0; background: var(--color-soft); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .ap-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .ap-photo-placeholder { width: 180px; height: 180px; border-radius: 50%; background: var(--color-soft); border: 3px solid var(--color-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ap-photo-placeholder svg { width: 64px; height: 64px; color: var(--color-subtle); }
+
+    /* ── Tags ───────────────────────────────────────────── */
+    .ap-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .ap-tag { padding: 5px 14px; border-radius: 999px; background: var(--color-soft); border: 1px solid var(--color-border); font-size: .78rem; font-weight: 600; color: var(--color-muted); letter-spacing: .04em; }
+
+    /* ── Biographie ─────────────────────────────────────── */
+    .ap-section { padding: 48px 0; border-top: 1px solid var(--color-border); }
+    .ap-section:first-child { border-top: none; }
+    .ap-section-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 700; color: var(--color-text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .ap-section-title::after { content: ''; flex: 1; height: 1px; background: var(--color-border); }
+    .ap-bio { font-size: 1.02rem; line-height: 1.8; color: var(--color-text); max-width: 720px; }
+    .ap-bio p { margin-bottom: 1.2em; }
+    .ap-bio p:last-child { margin-bottom: 0; }
+
+    /* ── Footer ─────────────────────────────────────────── */
+    footer { border-top: 1px solid var(--color-border); padding: 24px 0; margin-top: 64px; }
+    footer .wrap-wide { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; color: var(--color-subtle); flex-wrap: wrap; gap: 8px; }
+    body[data-lang="fr"] [data-lang="en"],
+    body[data-lang="en"] [data-lang="fr"] { display: none !important; }
+
+
+
+
+
+
+
+
+    .contact-banner {
+      background: var(--color-accent);
+      color: var(--color-accent-ink);
+      padding: 56px 0;
+      text-align: center;
+    }
+    .contact-banner h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      font-weight: 600; letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      color: var(--color-accent-ink);
+    }
+    .contact-banner p {
+      font-size: 1rem; opacity: .78; margin-bottom: 32px;
+      font-family: var(--font-heading); font-style: italic;
+    }
+    .contact-btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 999px;
+      font: inherit; font-size: .9rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: opacity .18s, transform .18s;
+      letter-spacing: .01em;
+    }
+    .contact-btn:hover { opacity: .85; transform: translateY(-2px); }
+    .contact-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .contact-btn-primary { background: var(--color-accent-ink); color: var(--color-accent); }
+    .contact-btn-ghost   { background: transparent; color: var(--color-accent-ink); border: 1.5px solid rgba(255,255,255,.55); }
+    .contact-btn-ghost:hover { border-color: rgba(255,255,255,.9); }
+  </style>
+</head>
+<body data-theme="editorial">
+
+  <header class="topbar">
+    <div class="wrap-wide topbar-inner">
+      <a class="home-btn" href="index.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-lang="fr">Accueil</span><span data-lang="en">Home</span>
+      </a>
+
+      <div class="controls">
+        <div class="pill" role="group" aria-label="Langue">
+          <button data-lang-btn="fr" class="is-active">FR</button>
+          <button data-lang-btn="en">EN</button>
+        </div>
+        <a class="conn-link" href="login.html" aria-label="Connexion">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <span class="conn-label" data-lang="fr">Connexion</span>
+          <span class="conn-label" data-lang="en">Login</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap-wide">
+
+      <!-- Hero -->
+      <div class="ap-hero">
+        <div>
+          <div class="ap-eyebrow" id="apEyebrow">
+            <span data-lang="fr">À propos de moi</span>
+            <span data-lang="en">About me</span>
+          </div>
+          <h1 class="ap-name">Pierre&#8209;Alexandre<br><span class="soft">Normand</span></h1>
+          <hr class="ap-rule" />
+          <p class="ap-subtitle" id="apSubtitle">
+            <span data-lang="fr">Gestionnaire et leader d'équipe — 20+ années en communications, gouvernance et organisation événementielle.</span>
+            <span data-lang="en">Manager and team leader — 20+ years in communications, governance, and event organization.</span>
+          </p>
+          <div class="ap-tags" id="apTags"></div>
+        </div>
+        <div id="apPhotoWrap">
+          <div class="ap-photo-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-5 3.6-9 9-9s9 4 9 9"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Biographie -->
+      <div class="ap-section">
+        <h2 class="ap-section-title" data-lang="fr">Biographie</h2>
+        <h2 class="ap-section-title" data-lang="en">Biography</h2>
+        <div class="ap-bio" id="apBio">
+          <span data-lang="fr">
+            <p>Pierre-Alexandre Normand est un gestionnaire expérimenté cumulant plus de 20 ans d'expertise en communications stratégiques, gestion d'équipes et organisation événementielle. Son parcours professionnel l'a conduit à œuvrer au sein de grandes organisations des secteurs public et privé, notamment Bell Média, où il a dirigé des équipes multidisciplinaires à travers des périodes de transformation organisationnelle importante.</p>
+            <p>Reconnu pour son leadership calme et sa capacité à mobiliser les équipes autour d'une vision commune, Pierre-Alexandre a développé une expertise distinctive dans la gestion du changement et la gouvernance. Il a également occupé des rôles de conseiller stratégique auprès de décideurs politiques et institutionnels.</p>
+            <p>Sa philosophie de gestion repose sur la transparence, le respect des personnes et la recherche constante d'excellence opérationnelle.</p>
+          </span>
+          <span data-lang="en">
+            <p>Pierre-Alexandre Normand is an experienced manager with over 20 years of expertise in strategic communications, team management, and event organization. His career has taken him through major public and private sector organizations, including Bell Media, where he led multidisciplinary teams through significant periods of organizational transformation.</p>
+            <p>Known for his calm leadership and ability to rally teams around a shared vision, Pierre-Alexandre has developed distinctive expertise in change management and governance. He has also served as a strategic advisor to political and institutional decision-makers.</p>
+            <p>His management philosophy is grounded in transparency, respect for people, and a constant pursuit of operational excellence.</p>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+
+  <section class="contact-banner" id="contactBanner">
+    <div class="wrap">
+      <h2 data-lang="fr">Un projet ? Une opportunité ?</h2>
+      <h2 data-lang="en">A project or opportunity?</h2>
+      <p data-lang="fr">Je suis toujours ouvert aux conversations qui mènent quelque part.</p>
+      <p data-lang="en">I'm always open to conversations that lead somewhere.</p>
+      <div class="contact-btns">
+        <a class="contact-btn contact-btn-primary" href="mailto:panormand@ccapcable.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span data-lang="fr">Envoyer un courriel</span>
+          <span data-lang="en">Send an email</span>
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.linkedin.com/in/panormand/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.facebook.com/panormand" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        <a class="contact-btn contact-btn-ghost" href="https://www.instagram.com/panormand" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="wrap-wide">
+      <span>Pierre-Alexandre Normand</span>
+      <span data-lang="fr">© 2026 — Tous droits réservés.</span>
+      <span data-lang="en">© 2026 — All rights reserved.</span>
+    </div>
+  </footer>
+
+  <script>
+    const APROPOS_KEY = 'pa-apropos';
+
+    // ── Langue ────────────────────────────────────────────
+    function applyLang(lang) {
+      document.body.dataset.lang = lang;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-lang-btn]').forEach(b =>
+        b.classList.toggle('is-active', b.dataset.langBtn === lang));
+      try { localStorage.setItem('pa-lang', lang); } catch(e) {}
+    }
+    const savedLang = (() => { try { return localStorage.getItem('pa-lang') || 'fr'; } catch(e) { return 'fr'; } })();
+    applyLang(savedLang);
+    document.querySelectorAll('[data-lang-btn]').forEach(btn =>
+      btn.addEventListener('click', () => applyLang(btn.dataset.langBtn)));
+
+    // ── Thème ─────────────────────────────────────────────
+    try {
+      const t = localStorage.getItem('pa-theme');
+      if (t) document.body.dataset.theme = t;
+    } catch(e) {}
+
+    // ── Contenu À propos ──────────────────────────────────
+    function loadApropos() {
+      let data;
+      try { data = JSON.parse(localStorage.getItem(APROPOS_KEY) || 'null'); } catch(e) {}
+      if (!data) return; // garder les défauts HTML
+
+      // Photo
+      const wrap = document.getElementById('apPhotoWrap');
+      if (data.photo) {
+        wrap.innerHTML = `<div class="ap-photo"><img src="${data.photo}" alt="Photo de Pierre-Alexandre Normand" /></div>`;
+      }
+
+      // Sous-titre
+      if (data.subtitle_fr || data.subtitle_en) {
+        document.getElementById('apSubtitle').innerHTML =
+          `<span data-lang="fr">${data.subtitle_fr || ''}</span>
+           <span data-lang="en">${data.subtitle_en || data.subtitle_fr || ''}</span>`;
+      }
+
+      // Tags
+      if (data.tags && data.tags.length) {
+        document.getElementById('apTags').innerHTML =
+          data.tags.map(t => `<span class="ap-tag">${t}</span>`).join('');
+      }
+
+      // Biographie
+      if (data.bio_fr || data.bio_en) {
+        const bioFr = (data.bio_fr || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+        const bioEn = (data.bio_en || data.bio_fr || '').split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+        document.getElementById('apBio').innerHTML =
+          `<span data-lang="fr">${bioFr}</span><span data-lang="en">${bioEn}</span>`;
+      }
+    }
+    loadApropos();
+  </script>
+</body>
+</html>
