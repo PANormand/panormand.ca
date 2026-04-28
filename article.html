@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Article — Pierre-Alexandre Normand</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css" />
+  <style>
+    *,*::before,*::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      transition: background .35s, color .35s;
+    }
+    a { color: inherit; text-decoration: none; }
+    p { margin: 0 0 1em; }
+
+    /* ====== THÈMES ====== */
+    :root, body[data-theme="editorial"] {
+      --font-heading: Georgia, "Times New Roman", "Cambria", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg: #f5f1e8; --color-surface: #fffdf8;
+      --color-text: #1a1a1a; --color-muted: #6b655b; --color-subtle: #918a7d;
+      --color-border: #e4ddcc; --color-accent: #7a3b2e; --color-accent-ink: #ffffff;
+      --color-soft: #ece4d1; --radius: 6px;
+      --shadow-sm: 0 1px 2px rgba(30,20,10,.04);
+      --shadow: 0 18px 40px -18px rgba(50,30,10,.18);
+    }
+    body[data-theme="executive"] {
+      --font-heading: "Cambria", Georgia, "Times New Roman", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg: #ffffff; --color-surface: #f5f7fb;
+      --color-text: #0d1b33; --color-muted: #4a5569; --color-subtle: #7a8296;
+      --color-border: #dbe1eb; --color-accent: #1a365d; --color-accent-ink: #ffffff;
+      --color-soft: #e4ecf7; --radius: 4px;
+      --shadow-sm: 0 1px 2px rgba(10,20,50,.04);
+      --shadow: 0 24px 48px -24px rgba(10,30,60,.18);
+    }
+    body[data-theme="signature"] {
+      --font-heading: Georgia, "Times New Roman", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --color-bg: #14110e; --color-surface: #1c1915;
+      --color-text: #f5efe4; --color-muted: #a39b8c; --color-subtle: #8a8374;
+      --color-border: #2c2823; --color-accent: #d4a968; --color-accent-ink: #14110e;
+      --color-soft: #2a241c; --radius: 10px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+      --shadow: 0 28px 60px -28px rgba(0,0,0,.7);
+    }
+
+    /* ====== LAYOUT ====== */
+    .wrap      { max-width: 760px; margin: 0 auto; padding: 0 32px; }
+    .wrap-wide { max-width: 1040px; margin: 0 auto; padding: 0 32px; }
+    @media (max-width: 720px) { .wrap, .wrap-wide { padding: 0 20px; } }
+
+    /* ====== TOPBAR ====== */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: saturate(160%) blur(12px);
+      -webkit-backdrop-filter: saturate(160%) blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; }
+    .back-link { display: inline-flex; align-items: center; gap: 7px; font-size: .88rem; color: var(--color-muted); transition: color .15s; }
+    .back-link:hover { color: var(--color-text); }
+    .pill { display: inline-flex; gap: 2px; padding: 3px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 999px; }
+    .pill button { border: 0; background: transparent; cursor: pointer; font: inherit; font-size: .78rem; color: var(--color-muted); padding: 5px 11px; border-radius: 999px; transition: background .2s, color .2s; }
+    .pill button.is-active { background: var(--color-accent); color: var(--color-accent-ink); }
+    .conn-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: 999px; font-size: .78rem; color: var(--color-muted); background: var(--color-surface); border: 1px solid var(--color-border); transition: color .15s, border-color .15s; }
+    .conn-link:hover { color: var(--color-text); border-color: var(--color-subtle); }
+    .conn-link svg { width: 13px; height: 13px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    /* ====== COVER ====== */
+    .cover-banner {
+      width: 100%; height: clamp(220px, 38vw, 420px);
+      background-size: cover; background-position: center;
+      background-color: var(--color-soft);
+      position: relative;
+    }
+    .cover-banner::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%);
+    }
+    .cover-banner.no-image { display: none; }
+
+    /* ====== ARTICLE ====== */
+    .article-header {
+      padding: 52px 0 32px;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 48px;
+    }
+    .article-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-size: .75rem; letter-spacing: .24em; text-transform: uppercase;
+      color: var(--color-muted); margin-bottom: 20px;
+    }
+    .article-eyebrow .cat { color: var(--color-accent); font-weight: 600; }
+    .article-eyebrow .dot { color: var(--color-border); }
+    .article-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 600; line-height: 1.1;
+      letter-spacing: -0.025em;
+      color: var(--color-text);
+      margin: 0 0 20px;
+    }
+    .article-excerpt {
+      font-family: var(--font-heading);
+      font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+      font-style: italic;
+      color: var(--color-muted);
+      line-height: 1.5;
+      max-width: 680px;
+    }
+
+    /* ====== CONTENU QUILL ====== */
+    .article-body {
+      padding-bottom: 64px;
+    }
+    /* Override Quill snow styles for reading */
+    .article-body .ql-editor {
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--color-text);
+      border: none;
+      background: transparent;
+    }
+    .article-body .ql-editor h1 { font-family: var(--font-heading); font-size: 2rem; font-weight: 600; letter-spacing: -0.02em; margin: 1.6em 0 .5em; color: var(--color-text); }
+    .article-body .ql-editor h2 { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.015em; margin: 1.4em 0 .4em; color: var(--color-text); }
+    .article-body .ql-editor h3 { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; margin: 1.2em 0 .35em; color: var(--color-text); }
+    .article-body .ql-editor p  { margin: 0 0 1.1em; }
+    .article-body .ql-editor a  { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+    .article-body .ql-editor a:hover { opacity: .8; }
+    .article-body .ql-editor blockquote {
+      border-left: 3px solid var(--color-accent);
+      padding: 4px 0 4px 20px;
+      margin: 1.5em 0;
+      color: var(--color-muted);
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+    .article-body .ql-editor ul, .article-body .ql-editor ol { padding-left: 1.5em; margin: .8em 0 1em; }
+    .article-body .ql-editor li { margin-bottom: .4em; }
+    .article-body .ql-editor img { max-width: 100%; border-radius: var(--radius); margin: 1em 0; }
+    .article-body .ql-editor iframe { max-width: 100%; border-radius: var(--radius); margin: 1em 0; aspect-ratio: 16/9; width: 100%; }
+    /* Font classes from Quill */
+    .article-body .ql-font-serif  { font-family: Georgia, "Times New Roman", serif !important; }
+    .article-body .ql-font-mono   { font-family: "Courier New", Courier, monospace !important; }
+    /* Alignment */
+    .article-body .ql-align-center  { text-align: center; }
+    .article-body .ql-align-right   { text-align: right; }
+    .article-body .ql-align-justify { text-align: justify; }
+
+    /* ====== NOT FOUND ====== */
+    .not-found { text-align: center; padding: 80px 0; color: var(--color-muted); }
+    .not-found .big { font-family: var(--font-heading); font-size: 5rem; color: var(--color-border); line-height: 1; margin-bottom: 20px; }
+    .not-found p { font-size: 1.05rem; margin-bottom: 24px; }
+    .not-found a { color: var(--color-accent); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ====== FOOTER ====== */
+    .article-footer {
+      padding: 36px 0 52px;
+      border-top: 1px solid var(--color-border);
+    }
+    .article-footer a {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .9rem; color: var(--color-muted);
+      transition: color .15s;
+    }
+    .article-footer a:hover { color: var(--color-text); }
+
+    /* LANG */
+    body[data-lang="fr"] [data-lang="en"],
+    body[data-lang="en"] [data-lang="fr"] { display: none !important; }
+
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 4px; }
+  </style>
+</head>
+<body data-theme="editorial" data-lang="fr">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="wrap-wide topbar-inner">
+      <a class="back-link" href="blog.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        <span data-lang="fr">Retour au blog</span>
+        <span data-lang="en">Back to blog</span>
+      </a>
+      <div class="topbar-right">
+        <div class="pill" role="group" aria-label="Langue">
+          <button data-lang-btn="fr" class="is-active">FR</button>
+          <button data-lang-btn="en">EN</button>
+        </div>
+        <a class="conn-link" href="login.html" aria-label="Connexion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- BANDEAU DE COUVERTURE -->
+  <div class="cover-banner no-image" id="coverBanner"></div>
+
+  <!-- CONTENU DE L'ARTICLE -->
+  <div class="wrap" id="articleContainer">
+    <div class="not-found">
+      <div class="big">…</div>
+      <p data-lang="fr">Chargement de l'article…</p>
+      <p data-lang="en">Loading article…</p>
+    </div>
+  </div>
+
+  <script>
+    // Thème + langue
+    const langBtns = document.querySelectorAll('[data-lang-btn]');
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.langBtn;
+        document.body.dataset.lang = lang;
+        document.documentElement.lang = lang;
+        langBtns.forEach(b => b.classList.toggle('is-active', b === btn));
+        try { localStorage.setItem('pa-lang', lang); } catch(e) {}
+        renderArticle(); // re-render with new language
+      });
+    });
+    try {
+      const t = localStorage.getItem('pa-theme');
+      const l = localStorage.getItem('pa-lang');
+      if (t) document.body.dataset.theme = t;
+      if (l) { document.body.dataset.lang = l; document.documentElement.lang = l; langBtns.forEach(b => b.classList.toggle('is-active', b.dataset.langBtn === l)); }
+    } catch(e) {}
+
+    // ====== CHARGEMENT ARTICLE ======
+    const params = new URLSearchParams(location.search);
+    const postId = params.get('id');
+
+    function getLang() { return document.body.dataset.lang || 'fr'; }
+
+    function renderArticle() {
+      let posts = [];
+      try { posts = JSON.parse(localStorage.getItem('pa-blog-posts') || '[]'); } catch(e) {}
+
+      const container = document.getElementById('articleContainer');
+      const coverBanner = document.getElementById('coverBanner');
+      const lang = getLang();
+
+      if (!postId) {
+        showNotFound(container, lang); return;
+      }
+      const post = posts.find(p => p.id === postId);
+      if (!post) {
+        showNotFound(container, lang); return;
+      }
+
+      // Mise à jour du <title>
+      document.title = (lang === 'fr' ? post.title_fr : post.title_en) + ' — Pierre-Alexandre Normand';
+
+      // Couverture
+      if (post.cover) {
+        coverBanner.style.backgroundImage = `url('${post.cover}')`;
+        coverBanner.classList.remove('no-image');
+      } else {
+        coverBanner.style.backgroundImage = '';
+        coverBanner.classList.add('no-image');
+      }
+
+      const title   = lang === 'fr' ? post.title_fr   : post.title_en;
+      const cat     = lang === 'fr' ? post.cat_fr     : post.cat_en;
+      const excerpt = lang === 'fr' ? post.excerpt_fr : post.excerpt_en;
+      const content = lang === 'fr' ? post.content_fr : post.content_en;
+      const dateStr = post.date ? new Date(post.date + 'T12:00:00').toLocaleDateString(lang === 'fr' ? 'fr-CA' : 'en-CA', { year:'numeric', month:'long', day:'numeric' }) : '';
+
+      container.innerHTML = `
+        <header class="article-header">
+          <div class="article-eyebrow">
+            ${cat ? `<span class="cat">${cat}</span>` : ''}
+            ${cat && dateStr ? '<span class="dot">·</span>' : ''}
+            ${dateStr ? `<span>${dateStr}</span>` : ''}
+          </div>
+          <h1 class="article-title">${title || (lang === 'fr' ? 'Sans titre' : 'Untitled')}</h1>
+          ${excerpt ? `<p class="article-excerpt">${excerpt}</p>` : ''}
+        </header>
+        <div class="article-body">
+          <div class="ql-editor">${content || `<p style="color:var(--color-subtle);font-style:italic">${lang === 'fr' ? 'Contenu à venir.' : 'Content coming soon.'}</p>`}</div>
+        </div>
+        <footer class="article-footer">
+          <a href="blog.html">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            ${lang === 'fr' ? 'Retour au blog' : 'Back to blog'}
+          </a>
+        </footer>`;
+    }
+
+    function showNotFound(container, lang) {
+      document.getElementById('coverBanner').classList.add('no-image');
+      container.innerHTML = `
+        <div class="not-found">
+          <div class="big">404</div>
+          <p>${lang === 'fr' ? 'Article introuvable.' : 'Article not found.'}</p>
+          <a href="blog.html">${lang === 'fr' ? '← Retour au blog' : '← Back to blog'}</a>
+        </div>`;
+    }
+
+    renderArticle();
+  </script>
+</body>
+</html>
